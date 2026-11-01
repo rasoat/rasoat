@@ -3,7 +3,7 @@ import { NOTICES, verdictFor, type Product, type SiteOutcome, type Snapshot, typ
 import type { Loaded } from "./data.ts";
 import type { Walked } from "./walk.ts";
 
-export const VERSION = "0.2.0";
+export const VERSION = "0.2.1";
 export const TOOL = "rasoat";
 
 export interface Result extends Verdict {

@@ -90,21 +90,28 @@ async function answer(m: Message): Promise<object | null> {
   }
 }
 
-const write = (message: object) => process.stdout.write(`${JSON.stringify(message)}\n`);
+/** Resolves when the bytes are out. On Linux a pipe is non-blocking here, so exiting before this cuts a large answer short. */
+const write = (message: object) => new Promise<void>((resolve, reject) => {
+  process.stdout.write(`${JSON.stringify(message)}\n`, (e) => (e ? reject(e) : resolve()));
+});
+
+async function reply(text: string): Promise<object | null> {
+  let message: Message;
+  try {
+    message = JSON.parse(text);
+  } catch {
+    return error(null, -32700, "Parse error");
+  }
+  return answer(message).catch((e) => error(message.id, -32603, (e as Error).message));
+}
 
 /** Reads until stdin closes, which is how a client ends a stdio server, then finishes what is in flight and exits. */
 export async function serve(): Promise<never> {
   const pending = new Set<Promise<void>>();
   const handle = (text: string) => {
-    let message: Message;
-    try {
-      message = JSON.parse(text);
-    } catch {
-      return write(error(null, -32700, "Parse error"));
-    }
-    const job: Promise<void> = answer(message)
-      .then((a) => { if (a) write(a); })
-      .catch((e) => { write(error(message.id, -32603, (e as Error).message)); })
+    const job: Promise<void> = reply(text)
+      .then((a) => (a ? write(a) : undefined))
+      .catch(() => {}) // the client has gone: nobody is left to tell
       .finally(() => { pending.delete(job); });
     pending.add(job);
   };

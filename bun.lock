@@ -13,7 +13,7 @@
     },
     "apps/cli": {
       "name": "@rasoat/cli",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "bin": {
         "rasoat": "./src/main.ts",
       },
