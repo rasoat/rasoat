@@ -6,7 +6,8 @@ Checks the versions a project or site runs against published vulnerabilities, an
 rasoat scan              # the current directory; finds every project under it
 rasoat scan ~/sites      # a folder of client sites
 rasoat scan example.com  # a site from outside: only what any browser downloads
-rasoat scan . --json     # for CI and for AI agents
+rasoat scan . --json     # for CI
+rasoat mcp               # for AI agents: read-only tools over stdio
 ```
 
 ## Install
@@ -22,6 +23,39 @@ shasum -a 256 -c SHA256SUMS --ignore-missing
 
 Only `darwin-arm64` is run by hand before a release; the workflow runs the tests and the Linux binary's scan. From source,
 with [Bun](https://bun.sh): `bun install && bun run rasoat scan .`
+
+## Use it from an AI agent
+
+`rasoat mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server over stdio, with two read-only tools:
+`scan` (the same report as `--json`) and `fix_plan` (per finding: the version to move to, whether it crosses a major
+version, the runtime it needs, the file and command, the official upgrade guides). Your agent makes the change, with your
+consent, and scans again. No account, and no token.
+
+Claude Code, with the skill that teaches that loop (install the binary first, see above):
+
+```
+claude plugin marketplace add rasoat/rasoat
+claude plugin install rasoat@rasoat
+```
+
+Any other MCP client:
+
+```json
+{ "mcpServers": { "rasoat": { "command": "rasoat", "args": ["mcp"] } } }
+```
+
+The skill itself is [one file](plugin/skills/rasoat/SKILL.md), if your agent reads skills another way.
+
+What the MCP mode holds to:
+
+- It changes nothing. It writes only its data cache, and `fix_plan` returns commands, it never runs them.
+- It refuses local and private addresses, on every redirect too: an agent picks the address, perhaps from text it read. The
+  terminal command still reads `localhost`, because a person chose it there.
+- A version from the downloaded data reaches a command only if it is a plain version number.
+- Each result says its strings are data, not instructions, and long strings are cut at 500 characters. Advisory text and
+  a scanned project's files are third-party text in your agent's context all the same, so keep your agent's own approval
+  prompts on.
+- Tool descriptions are constants in the binary. Nothing downloaded or scanned can change them.
 
 ## What it reads
 
@@ -40,6 +74,7 @@ frameworks. A clean result covers only the versions it lists. Use `npm audit` or
   nothing about your project. `--offline` removes it: the binary carries the data from its build.
 - `rasoat scan <url>` fetches that site's page and scripts, as a browser does. If bot protection answers, it reports that
   and stops.
+- `rasoat mcp` sends the same things, no more.
 - No account, no token, no telemetry. Your files, paths and versions are not sent anywhere.
 
 It reads files as text and never runs project code, follows no symlink, and writes only its cache (`~/.cache/rasoat/`,

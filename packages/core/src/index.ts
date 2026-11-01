@@ -5,6 +5,7 @@ export * from "./wordpress.ts";
 export * from "./runtimes.ts";
 export * from "./checker/runtime.ts";
 export * from "./checker/input.ts";
+export * from "./checker/address.ts";
 export * from "./checker/http.ts";
 export * from "./checker/site.ts";
 export * from "./snapshot.ts";

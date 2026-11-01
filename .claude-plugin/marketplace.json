@@ -1,0 +1,12 @@
+{
+  "name": "rasoat",
+  "owner": { "name": "Rà Soát editors", "email": "editors@rasoat.com" },
+  "description": "Check the versions you run against published vulnerabilities, and plan the fix.",
+  "plugins": [
+    {
+      "name": "rasoat",
+      "source": "./plugin",
+      "description": "Scan a project or site for vulnerable Next.js, WordPress core, Node.js, PHP and Bun versions, then upgrade and rescan. Read-only tools; the fix stays in your hands."
+    }
+  ]
+}

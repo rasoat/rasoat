@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "rasoat": { "command": "rasoat", "args": ["mcp"] }
+  }
+}
