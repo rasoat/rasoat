@@ -1,0 +1,9 @@
+{
+  "name": "fixture/bedrock",
+  "require": {
+    "roots/wordpress-no-content": "6.5.2"
+  },
+  "config": {
+    "allow-plugins": false
+  }
+}

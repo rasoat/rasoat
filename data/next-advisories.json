@@ -1,0 +1,1889 @@
+{
+  "source": "GitHub Advisory Database — https://github.com/advisories?query=ecosystem%3Anpm+next",
+  "license": "CC-BY-4.0 — https://github.com/github/advisory-database/blob/main/LICENSE.md",
+  "scope": "npm package \"next\", reviewed, not withdrawn (all versions; pages list those reaching >= 13.0.0)",
+  "fetched": "2026-10-31",
+  "total_fetched": 77,
+  "advisories": [
+    {
+      "ghsa": "GHSA-2464-fhr4-w9xw",
+      "cve": null,
+      "severity": "critical",
+      "cvss": 9.5,
+      "cwes": [
+        "CWE-1395"
+      ],
+      "summary": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+      "published": "2026-10-22",
+      "updated": "2026-10-22",
+      "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, <= 15.5.27",
+          "patched": "15.5.28"
+        },
+        {
+          "vulnerable": ">= 16.0.0, <= 16.4.0",
+          "patched": "16.4.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-673q-mjm6-r5xr",
+      "cve": null,
+      "severity": "critical",
+      "cvss": 9.5,
+      "cwes": [
+        "CWE-502"
+      ],
+      "summary": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+      "published": "2026-10-22",
+      "updated": "2026-10-22",
+      "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, <= 16.4.0",
+          "patched": "16.4.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-h694-7cp9-m8p3",
+      "cve": "CVE-2026-103004",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "next.js cache leak across root param values in nested 'use cache' functions",
+      "published": "2026-10-22",
+      "updated": "2026-10-22",
+      "url": "https://github.com/advisories/GHSA-h694-7cp9-m8p3",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.3.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-p3m5-59mp-jv5r",
+      "cve": "CVE-2026-94482",
+      "severity": "high",
+      "cvss": 8.2,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js: Denial of Service in App Router using Server Actions",
+      "published": "2026-10-22",
+      "updated": "2026-10-22",
+      "url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, <= 15.5.27",
+          "patched": "15.5.28"
+        },
+        {
+          "vulnerable": ">= 16.0.0, <= 16.4.0",
+          "patched": "16.4.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-39w2-rjm5-chcv",
+      "cve": "CVE-2026-94486",
+      "severity": "low",
+      "cvss": 2.3,
+      "cwes": [
+        "CWE-346"
+      ],
+      "summary": "Next.js has information disclosure in development server's Model Context Protocol endpoint",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-3w37-wq28-93x7",
+      "cve": "CVE-2026-94544",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "Next.js: Pending `use cache` fill can leak Draft Mode content into regular responses and persisted pages",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.3.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-4jqv-mc3x-m676",
+      "cve": "CVE-2026-94543",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "Next.js has cache poisoning of SSG and ISR pages in self-hosted applications",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, < 15.5.27",
+          "patched": "15.5.27"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-cjq9-62q9-8jv4",
+      "cve": "CVE-2026-94483",
+      "severity": "high",
+      "cvss": 8.3,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js has Server-Side Request Forgery in Image Optimization",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-f87g-xv8r-7p7x",
+      "cve": "CVE-2026-94485",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-346"
+      ],
+      "summary": "Next.js has information disclosure in App Router metadata image routes via dynamicParams bypass",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.8",
+          "patched": "16.3.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-mcj8-r9mp-w47p",
+      "cve": "CVE-2026-94484",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "Next.js has cache poisoning in SSG/ISR rendering that leads to cross-user content substitution and persistent denial of service",
+      "published": "2026-10-07",
+      "updated": "2026-10-07",
+      "url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.8",
+          "patched": "16.3.8"
+        },
+        {
+          "vulnerable": ">= 15.0.0, < 15.5.27",
+          "patched": "15.5.27"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-vcvr-r3jv-pc5j",
+      "cve": null,
+      "severity": "critical",
+      "cvss": 9.5,
+      "cwes": [
+        "CWE-1395"
+      ],
+      "summary": "Next.js: Remote Code Execution in next/og ImageResponse",
+      "published": "2026-09-30",
+      "updated": "2026-09-30",
+      "url": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.2.0, < 16.3.6",
+          "patched": "16.3.6"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-2xp9-vwfh-vxw4",
+      "cve": null,
+      "severity": "critical",
+      "cvss": 9.5,
+      "cwes": [
+        "CWE-1395"
+      ],
+      "summary": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used",
+      "published": "2026-09-08",
+      "updated": "2026-09-08",
+      "url": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 15.5.24",
+          "patched": "15.5.24"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.3",
+          "patched": "16.3.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-p293-qw3h-jr36",
+      "cve": "CVE-2026-75604",
+      "severity": "critical",
+      "cvss": 9,
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers",
+      "published": "2026-09-08",
+      "updated": "2026-09-08",
+      "url": "https://github.com/advisories/GHSA-p293-qw3h-jr36",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.0, < 15.5.24",
+          "patched": "15.5.24"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.3.3",
+          "patched": "16.3.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-4633-3j49-mh5q",
+      "cve": "CVE-2026-64647",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-116"
+      ],
+      "summary": "Next.js: Cache confusion of response bodies for requests with bodies containing invalid UTF-8 byte sequences",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-4633-3j49-mh5q",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-4c39-4ccg-62r3",
+      "cve": "CVE-2026-64646",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js: Unbounded Server Action payload in Edge runtime",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-4c39-4ccg-62r3",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-68g3-v927-f742",
+      "cve": "CVE-2026-64648",
+      "severity": "medium",
+      "cvss": 6,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "Next.js: Cache confusion of response bodies for requests with bodies",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-68g3-v927-f742",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-6gpp-xcg3-4w24",
+      "cve": "CVE-2026-64642",
+      "severity": "high",
+      "cvss": 8.3,
+      "cwes": [
+        "CWE-285"
+      ],
+      "summary": "Next.js: Middleware / Proxy bypass in App Router applications using Turbopack and single locale",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-6gpp-xcg3-4w24",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-89xv-2m56-2m9x",
+      "cve": "CVE-2026-64649",
+      "severity": "high",
+      "cvss": 8.3,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js: Server-Side Request Forgery in Server Actions on custom servers",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-89xv-2m56-2m9x",
+      "ranges": [
+        {
+          "vulnerable": ">= 14.1.1, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-955p-x3mx-jcvp",
+      "cve": "CVE-2026-64643",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-201"
+      ],
+      "summary": "Next.js: Unauthenticated disclosure of internal Server Function endpoints",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-955p-x3mx-jcvp",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-m99w-x7hq-7vfj",
+      "cve": "CVE-2026-64641",
+      "severity": "high",
+      "cvss": 8.2,
+      "cwes": [
+        "CWE-834"
+      ],
+      "summary": "Next.js: Denial of Service in App Router using Server Actions",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-m99w-x7hq-7vfj",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-p9j2-gv94-2wf4",
+      "cve": "CVE-2026-64645",
+      "severity": "high",
+      "cvss": 8.3,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js: Server-Side Request Forgery in rewrites via attacker-controlled destination hostname",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-p9j2-gv94-2wf4",
+      "ranges": [
+        {
+          "vulnerable": ">= 12.0.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-q8wf-6r8g-63ch",
+      "cve": "CVE-2026-64644",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-407"
+      ],
+      "summary": "Next.js: Denial of Service in the Image Optimization API using SVGs",
+      "published": "2026-07-22",
+      "updated": "2026-07-22",
+      "url": "https://github.com/advisories/GHSA-q8wf-6r8g-63ch",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.5.0, < 15.5.21",
+          "patched": "15.5.21"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.11",
+          "patched": "16.2.11"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-267c-6grr-h53f",
+      "cve": "CVE-2026-44575",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-288"
+      ],
+      "summary": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-267c-6grr-h53f",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.2.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-26hh-7cqf-hhc6",
+      "cve": "CVE-2026-45109",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-288"
+      ],
+      "summary": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes - Incomplete Fix Follow-Up",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-26hh-7cqf-hhc6",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.2.0, < 15.5.18",
+          "patched": "15.5.18"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.6",
+          "patched": "16.2.6"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-36qx-fr4f-26g5",
+      "cve": "CVE-2026-44573",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-863"
+      ],
+      "summary": "Next.js has a Middleware / Proxy bypass in Pages Router applications using i18n",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-36qx-fr4f-26g5",
+      "ranges": [
+        {
+          "vulnerable": ">= 12.2.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-3g8h-86w9-wvmq",
+      "cve": "CVE-2026-44572",
+      "severity": "low",
+      "cvss": 3.7,
+      "cwes": [
+        "CWE-349"
+      ],
+      "summary": "Next.js's Middleware / Proxy redirects can be cache-poisoned",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-3g8h-86w9-wvmq",
+      "ranges": [
+        {
+          "vulnerable": ">= 12.2.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-492v-c6pp-mqqv",
+      "cve": "CVE-2026-44574",
+      "severity": "high",
+      "cvss": 8.1,
+      "cwes": [
+        "CWE-288"
+      ],
+      "summary": "Next.js has a Middleware / Proxy bypass through dynamic route parameter injection",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-492v-c6pp-mqqv",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.4.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-8h8q-6873-q5fj",
+      "cve": null,
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js Vulnerable to Denial of Service with Server Components",
+      "published": "2026-05-11",
+      "updated": "2026-05-11",
+      "url": "https://github.com/advisories/GHSA-8h8q-6873-q5fj",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-c4j6-fc7j-m34r",
+      "cve": "CVE-2026-44578",
+      "severity": "high",
+      "cvss": 8.6,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js vulnerable to server-side request forgery in applications using WebSocket upgrades",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-c4j6-fc7j-m34r",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.13, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-ffhc-5mcf-pf4q",
+      "cve": "CVE-2026-44581",
+      "severity": "medium",
+      "cvss": 4.7,
+      "cwes": [
+        "CWE-79"
+      ],
+      "summary": "Next.js vulnerable to cross-site scripting in App Router applications using CSP nonces",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-ffhc-5mcf-pf4q",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-gx5p-jg67-6x7h",
+      "cve": "CVE-2026-44580",
+      "severity": "medium",
+      "cvss": 6.1,
+      "cwes": [
+        "CWE-79"
+      ],
+      "summary": "Next.js has cross-site scripting in beforeInteractive scripts with untrusted input",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-gx5p-jg67-6x7h",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-h64f-5h5j-jqjh",
+      "cve": "CVE-2026-44577",
+      "severity": "medium",
+      "cvss": 5.9,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js has a Denial of Service in the Image Optimization API",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-h64f-5h5j-jqjh",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-mg66-mrh9-m8jx",
+      "cve": "CVE-2026-44579",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js vulnerable to Denial of Service via connection exhaustion in applications using Cache Components",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-mg66-mrh9-m8jx",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-vfv6-92ff-j949",
+      "cve": "CVE-2026-44582",
+      "severity": "low",
+      "cvss": 3.7,
+      "cwes": [
+        "CWE-328"
+      ],
+      "summary": "Next.js vulnerable to cache poisoning via collisions in React Server Component cache-busting",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-vfv6-92ff-j949",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.6, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-wfc6-r584-vfw7",
+      "cve": "CVE-2026-44576",
+      "severity": "medium",
+      "cvss": 5.4,
+      "cwes": [
+        "CWE-436"
+      ],
+      "summary": "Next.js vulnerable to cache poisoning in React Server Component responses",
+      "published": "2026-05-11",
+      "updated": "2026-05-14",
+      "url": "https://github.com/advisories/GHSA-wfc6-r584-vfw7",
+      "ranges": [
+        {
+          "vulnerable": ">= 14.2.0, < 15.5.16",
+          "patched": "15.5.16"
+        },
+        {
+          "vulnerable": ">= 16.0.0, < 16.2.5",
+          "patched": "16.2.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-q4gf-8mx6-v5v3",
+      "cve": null,
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js has a Denial of Service with Server Components",
+      "published": "2026-04-10",
+      "updated": "2026-04-10",
+      "url": "https://github.com/advisories/GHSA-q4gf-8mx6-v5v3",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.5.15",
+          "patched": "15.5.15"
+        },
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.2.3",
+          "patched": "16.2.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-3x4c-7xq6-9pq8",
+      "cve": "CVE-2026-27980",
+      "severity": "medium",
+      "cvss": 6.9,
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "Next.js: Unbounded next/image disk cache growth can exhaust storage",
+      "published": "2026-03-17",
+      "updated": "2026-03-19",
+      "url": "https://github.com/advisories/GHSA-3x4c-7xq6-9pq8",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.1.7",
+          "patched": "16.1.7"
+        },
+        {
+          "vulnerable": ">= 10.0.0, < 15.5.14",
+          "patched": "15.5.14"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-ggv3-7p47-pfv8",
+      "cve": "CVE-2026-29057",
+      "severity": "medium",
+      "cvss": 6.3,
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "Next.js: HTTP request smuggling in rewrites",
+      "published": "2026-03-17",
+      "updated": "2026-03-18",
+      "url": "https://github.com/advisories/GHSA-ggv3-7p47-pfv8",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.1.7",
+          "patched": "16.1.7"
+        },
+        {
+          "vulnerable": ">= 9.5.0, < 15.5.13",
+          "patched": "15.5.13"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-h27x-g6w4-24gq",
+      "cve": "CVE-2026-27979",
+      "severity": "medium",
+      "cvss": 6.9,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js: Unbounded postponed resume buffering can lead to DoS",
+      "published": "2026-03-17",
+      "updated": "2026-03-19",
+      "url": "https://github.com/advisories/GHSA-h27x-g6w4-24gq",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.1, < 16.1.7",
+          "patched": "16.1.7"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-jcc7-9wpm-mj36",
+      "cve": "CVE-2026-27977",
+      "severity": "low",
+      "cvss": 2.3,
+      "cwes": [
+        "CWE-1385"
+      ],
+      "summary": "Next.js: null origin can bypass dev HMR websocket CSRF checks",
+      "published": "2026-03-17",
+      "updated": "2026-03-25",
+      "url": "https://github.com/advisories/GHSA-jcc7-9wpm-mj36",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.1, < 16.1.7",
+          "patched": "16.1.7"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-mq59-m269-xvcx",
+      "cve": "CVE-2026-27978",
+      "severity": "medium",
+      "cvss": 5.3,
+      "cwes": [
+        "CWE-352"
+      ],
+      "summary": "Next.js: null origin can bypass Server Actions CSRF checks",
+      "published": "2026-03-17",
+      "updated": "2026-03-19",
+      "url": "https://github.com/advisories/GHSA-mq59-m269-xvcx",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.1, < 16.1.7",
+          "patched": "16.1.7"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-5f7q-jpqc-wp7h",
+      "cve": "CVE-2025-59472",
+      "severity": "medium",
+      "cvss": 5.9,
+      "cwes": [
+        "CWE-400",
+        "CWE-409",
+        "CWE-770"
+      ],
+      "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+      "published": "2026-01-28",
+      "updated": "2026-04-08",
+      "url": "https://github.com/advisories/GHSA-5f7q-jpqc-wp7h",
+      "ranges": [
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.1.5",
+          "patched": "16.1.5"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.0, < 15.6.0-canary.61",
+          "patched": "15.6.0-canary.61"
+        },
+        {
+          "vulnerable": ">= 15.0.0-canary.0, <= 15.0.0-canary.205",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.0.1-canary.0, <= 15.0.1-canary.3",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.0.2-canary.0, <= 15.0.2-canary.11",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.0.3-canary.0, <= 15.0.3-canary.9",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.0.4-canary.0, <= 15.0.4-canary.52",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.1.1-canary.0, <= 15.1.1-canary.27",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.2.0-canary.0, <= 15.2.0-canary.77",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.2.1-canary.0, <= 15.2.1-canary.6",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.2.2-canary.0, <= 15.2.2-canary.7",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.3.0-canary.0, <= 15.3.0-canary.46",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.3.1-canary.0, <= 15.3.1-canary.15",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.4.0-canary.0, <= 15.4.0-canary.130",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.4.2-canary.0, <= 15.4.2-canary.56",
+          "patched": null
+        },
+        {
+          "vulnerable": ">= 15.5.1-canary.0, <= 15.5.1-canary.39",
+          "patched": null
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-h25m-26qc-wcjf",
+      "cve": null,
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-400",
+        "CWE-502"
+      ],
+      "summary": "Next.js HTTP request deserialization can lead to DoS when using insecure React Server Components",
+      "published": "2026-01-28",
+      "updated": "2026-01-28",
+      "url": "https://github.com/advisories/GHSA-h25m-26qc-wcjf",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 15.0.8",
+          "patched": "15.0.8"
+        },
+        {
+          "vulnerable": ">= 15.1.1-canary.0, < 15.1.12",
+          "patched": "15.1.12"
+        },
+        {
+          "vulnerable": ">= 15.2.0-canary.0, < 15.2.9",
+          "patched": "15.2.9"
+        },
+        {
+          "vulnerable": ">= 15.3.0-canary.0, < 15.3.9",
+          "patched": "15.3.9"
+        },
+        {
+          "vulnerable": ">= 15.4.0-canary.0, < 15.4.11",
+          "patched": "15.4.11"
+        },
+        {
+          "vulnerable": ">= 15.5.1-canary.0, < 15.5.10",
+          "patched": "15.5.10"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.0, < 15.6.0-canary.61",
+          "patched": "15.6.0-canary.61"
+        },
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.0.11",
+          "patched": "16.0.11"
+        },
+        {
+          "vulnerable": ">= 16.1.0-canary.0, < 16.1.5",
+          "patched": "16.1.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-9g9p-9gw9-jx7f",
+      "cve": "CVE-2025-59471",
+      "severity": "medium",
+      "cvss": 5.9,
+      "cwes": [
+        "CWE-400",
+        "CWE-770"
+      ],
+      "summary": "Next.js self-hosted applications vulnerable to DoS via Image Optimizer remotePatterns configuration",
+      "published": "2026-01-27",
+      "updated": "2026-01-27",
+      "url": "https://github.com/advisories/GHSA-9g9p-9gw9-jx7f",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 15.5.10",
+          "patched": "15.5.10"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.0, < 16.1.5",
+          "patched": "16.1.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-5j59-xgg2-r9c4",
+      "cve": null,
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-400",
+        "CWE-502",
+        "CWE-1395"
+      ],
+      "summary": "Next has a Denial of Service with Server Components - Incomplete Fix Follow-Up",
+      "published": "2025-12-12",
+      "updated": "2026-01-15",
+      "url": "https://github.com/advisories/GHSA-5j59-xgg2-r9c4",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.3.1-canary.0, < 14.2.35",
+          "patched": "14.2.35"
+        },
+        {
+          "vulnerable": ">= 15.0.6, < 15.0.7",
+          "patched": "15.0.7"
+        },
+        {
+          "vulnerable": ">= 15.1.10, < 15.1.11",
+          "patched": "15.1.11"
+        },
+        {
+          "vulnerable": ">= 15.2.7, < 15.2.8",
+          "patched": "15.2.8"
+        },
+        {
+          "vulnerable": ">= 15.3.7, < 15.3.8",
+          "patched": "15.3.8"
+        },
+        {
+          "vulnerable": ">= 15.4.9, < 15.4.10",
+          "patched": "15.4.10"
+        },
+        {
+          "vulnerable": ">= 15.5.8, < 15.5.9",
+          "patched": "15.5.9"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.59, < 15.6.0-canary.60",
+          "patched": "15.6.0-canary.60"
+        },
+        {
+          "vulnerable": ">= 16.0.9, < 16.0.10",
+          "patched": "16.0.10"
+        },
+        {
+          "vulnerable": ">= 16.1.0-canary.17, < 16.1.0-canary.19",
+          "patched": "16.1.0-canary.19"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-mwv6-3258-q52c",
+      "cve": null,
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-400",
+        "CWE-502",
+        "CWE-1395"
+      ],
+      "summary": "Next Vulnerable to Denial of Service with Server Components",
+      "published": "2025-12-11",
+      "updated": "2025-12-11",
+      "url": "https://github.com/advisories/GHSA-mwv6-3258-q52c",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.3.0, < 14.2.34",
+          "patched": "14.2.34"
+        },
+        {
+          "vulnerable": ">= 15.0.0-canary.0, < 15.0.6",
+          "patched": "15.0.6"
+        },
+        {
+          "vulnerable": ">= 15.1.1-canary.0, < 15.1.10",
+          "patched": "15.1.10"
+        },
+        {
+          "vulnerable": ">= 15.2.0-canary.0, < 15.2.7",
+          "patched": "15.2.7"
+        },
+        {
+          "vulnerable": ">= 15.3.0-canary.0, < 15.3.7",
+          "patched": "15.3.7"
+        },
+        {
+          "vulnerable": ">= 15.4.0-canary.0, < 15.4.9",
+          "patched": "15.4.9"
+        },
+        {
+          "vulnerable": ">= 15.5.1-canary.0, < 15.5.8",
+          "patched": "15.5.8"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.0, < 15.6.0-canary.59",
+          "patched": "15.6.0-canary.59"
+        },
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.0.9",
+          "patched": "16.0.9"
+        },
+        {
+          "vulnerable": ">= 16.1.0-canary.0, < 16.1.0-canary.17",
+          "patched": "16.1.0-canary.17"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-w37m-7fhw-fmv9",
+      "cve": null,
+      "severity": "medium",
+      "cvss": 5.3,
+      "cwes": [
+        "CWE-497",
+        "CWE-502",
+        "CWE-1395"
+      ],
+      "summary": "Next Server Actions Source Code Exposure ",
+      "published": "2025-12-11",
+      "updated": "2025-12-11",
+      "url": "https://github.com/advisories/GHSA-w37m-7fhw-fmv9",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0-canary.0, < 15.0.6",
+          "patched": "15.0.6"
+        },
+        {
+          "vulnerable": ">= 15.1.1-canary.0, < 15.1.10",
+          "patched": "15.1.10"
+        },
+        {
+          "vulnerable": ">= 15.2.0-canary.0, < 15.2.7",
+          "patched": "15.2.7"
+        },
+        {
+          "vulnerable": ">= 15.3.0-canary.0, < 15.3.7",
+          "patched": "15.3.7"
+        },
+        {
+          "vulnerable": ">= 15.4.0-canary.0, < 15.4.9",
+          "patched": "15.4.9"
+        },
+        {
+          "vulnerable": ">= 15.5.1-canary.0, < 15.5.8",
+          "patched": "15.5.8"
+        },
+        {
+          "vulnerable": ">= 15.6.0-canary.0, < 15.6.0-canary.59",
+          "patched": "15.6.0-canary.59"
+        },
+        {
+          "vulnerable": ">= 16.0.0-beta.0, < 16.0.9",
+          "patched": "16.0.9"
+        },
+        {
+          "vulnerable": ">= 16.1.0-canary.0, < 16.1.0-canary.17",
+          "patched": "16.1.0-canary.17"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-9qr9-h5gf-34mp",
+      "cve": null,
+      "severity": "critical",
+      "cvss": 10,
+      "cwes": [
+        "CWE-502"
+      ],
+      "summary": "Next.js is vulnerable to RCE in React flight protocol",
+      "published": "2025-12-03",
+      "updated": "2025-12-11",
+      "url": "https://github.com/advisories/GHSA-9qr9-h5gf-34mp",
+      "ranges": [
+        {
+          "vulnerable": ">= 14.3.0-canary.77, < 15.0.5",
+          "patched": "15.0.5"
+        },
+        {
+          "vulnerable": ">= 15.2.0-canary.0, < 15.2.6",
+          "patched": "15.2.6"
+        },
+        {
+          "vulnerable": ">= 15.3.0-canary.0, < 15.3.6",
+          "patched": "15.3.6"
+        },
+        {
+          "vulnerable": ">= 15.4.0-canary.0, < 15.4.8",
+          "patched": "15.4.8"
+        },
+        {
+          "vulnerable": ">= 16.0.0-canary.0, < 16.0.7",
+          "patched": "16.0.7"
+        },
+        {
+          "vulnerable": ">= 15.1.0-canary.0, < 15.1.9",
+          "patched": "15.1.9"
+        },
+        {
+          "vulnerable": ">= 15.5.0-canary.0, < 15.5.7",
+          "patched": "15.5.7"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-4342-x723-ch2f",
+      "cve": "CVE-2025-57822",
+      "severity": "medium",
+      "cvss": 6.5,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js Improper Middleware Redirect Handling Leads to SSRF",
+      "published": "2025-08-29",
+      "updated": "2025-09-11",
+      "url": "https://github.com/advisories/GHSA-4342-x723-ch2f",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0-canary.0, < 15.4.7",
+          "patched": "15.4.7"
+        },
+        {
+          "vulnerable": ">= 0.9.9, < 14.2.32",
+          "patched": "14.2.32"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-g5qg-72qw-gw5v",
+      "cve": "CVE-2025-57752",
+      "severity": "medium",
+      "cvss": 6.2,
+      "cwes": [
+        "CWE-524"
+      ],
+      "summary": "Next.js Affected by Cache Key Confusion for Image Optimization API Routes",
+      "published": "2025-08-29",
+      "updated": "2025-09-03",
+      "url": "https://github.com/advisories/GHSA-g5qg-72qw-gw5v",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, <= 15.4.4",
+          "patched": "15.4.5"
+        },
+        {
+          "vulnerable": ">= 0.9.9, < 14.2.31",
+          "patched": "14.2.31"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-xv57-4mr9-wg8v",
+      "cve": "CVE-2025-55173",
+      "severity": "medium",
+      "cvss": 4.3,
+      "cwes": [
+        "CWE-20"
+      ],
+      "summary": "Next.js Content Injection Vulnerability for Image Optimization",
+      "published": "2025-08-29",
+      "updated": "2025-09-11",
+      "url": "https://github.com/advisories/GHSA-xv57-4mr9-wg8v",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, <= 15.4.4",
+          "patched": "15.4.5"
+        },
+        {
+          "vulnerable": ">= 0.9.9, < 14.2.31",
+          "patched": "14.2.31"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-67rr-84xm-4c7r",
+      "cve": "CVE-2025-49826",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "Next.JS vulnerability can lead to DoS via cache poisoning ",
+      "published": "2025-07-03",
+      "updated": "2025-07-03",
+      "url": "https://github.com/advisories/GHSA-67rr-84xm-4c7r",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.4-canary.51, < 15.1.8",
+          "patched": "15.1.8"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-r2fc-ccr8-96c4",
+      "cve": "CVE-2025-49005",
+      "severity": "low",
+      "cvss": 3.7,
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "Next.js has a Cache poisoning vulnerability due to omission of the Vary header",
+      "published": "2025-07-03",
+      "updated": "2025-07-03",
+      "url": "https://github.com/advisories/GHSA-r2fc-ccr8-96c4",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.3.0, < 15.3.3",
+          "patched": "15.3.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-3h52-269p-cp9r",
+      "cve": "CVE-2025-48068",
+      "severity": "low",
+      "cvss": 2.3,
+      "cwes": [
+        "CWE-1385"
+      ],
+      "summary": "Information exposure in Next.js dev server due to lack of origin verification",
+      "published": "2025-05-28",
+      "updated": "2025-06-13",
+      "url": "https://github.com/advisories/GHSA-3h52-269p-cp9r",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, < 15.2.2",
+          "patched": "15.2.2"
+        },
+        {
+          "vulnerable": ">= 13.0, < 14.2.30",
+          "patched": "14.2.30"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-qpjv-v59x-3qc4",
+      "cve": "CVE-2025-32421",
+      "severity": "low",
+      "cvss": 3.7,
+      "cwes": [
+        "CWE-362"
+      ],
+      "summary": "Next.js Race Condition to Cache Poisoning",
+      "published": "2025-05-15",
+      "updated": "2025-09-26",
+      "url": "https://github.com/advisories/GHSA-qpjv-v59x-3qc4",
+      "ranges": [
+        {
+          "vulnerable": ">= 15.0.0, < 15.1.6",
+          "patched": "15.1.6"
+        },
+        {
+          "vulnerable": ">= 0.9.9, < 14.2.24",
+          "patched": "14.2.24"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-223j-4rm8-mrmf",
+      "cve": "CVE-2025-30218",
+      "severity": "low",
+      "cvss": 1.7,
+      "cwes": [
+        "CWE-200"
+      ],
+      "summary": "Next.js may leak x-middleware-subrequest-id to external hosts",
+      "published": "2025-04-02",
+      "updated": "2025-10-13",
+      "url": "https://github.com/advisories/GHSA-223j-4rm8-mrmf",
+      "ranges": [
+        {
+          "vulnerable": "= 12.3.5",
+          "patched": "12.3.6"
+        },
+        {
+          "vulnerable": "= 13.5.9",
+          "patched": "13.5.10"
+        },
+        {
+          "vulnerable": "= 14.2.25",
+          "patched": "14.2.26"
+        },
+        {
+          "vulnerable": "= 15.2.3",
+          "patched": "15.2.4"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-f82v-jwr5-mffw",
+      "cve": "CVE-2025-29927",
+      "severity": "critical",
+      "cvss": 9.1,
+      "cwes": [
+        "CWE-285",
+        "CWE-863"
+      ],
+      "summary": "Authorization Bypass in Next.js Middleware",
+      "published": "2025-03-21",
+      "updated": "2026-03-02",
+      "url": "https://github.com/advisories/GHSA-f82v-jwr5-mffw",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 13.5.9",
+          "patched": "13.5.9"
+        },
+        {
+          "vulnerable": ">= 14.0.0, < 14.2.25",
+          "patched": "14.2.25"
+        },
+        {
+          "vulnerable": ">= 15.0.0, < 15.2.3",
+          "patched": "15.2.3"
+        },
+        {
+          "vulnerable": ">= 12.0.0, < 12.3.5",
+          "patched": "12.3.5"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-7m27-7ghc-44w9",
+      "cve": "CVE-2024-56332",
+      "severity": "medium",
+      "cvss": 5.3,
+      "cwes": [
+        "CWE-770"
+      ],
+      "summary": "Next.js Allows a Denial of Service (DoS) with Server Actions",
+      "published": "2025-01-03",
+      "updated": "2025-01-07",
+      "url": "https://github.com/advisories/GHSA-7m27-7ghc-44w9",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.0.0, < 13.5.8",
+          "patched": "13.5.8"
+        },
+        {
+          "vulnerable": ">= 14.0.0, < 14.2.21",
+          "patched": "14.2.21"
+        },
+        {
+          "vulnerable": ">= 15.0.0, < 15.1.2",
+          "patched": "15.1.2"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-7gfc-8cq8-jh5f",
+      "cve": "CVE-2024-51479",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-285",
+        "CWE-863"
+      ],
+      "summary": "Next.js authorization bypass vulnerability",
+      "published": "2024-12-17",
+      "updated": "2025-09-10",
+      "url": "https://github.com/advisories/GHSA-7gfc-8cq8-jh5f",
+      "ranges": [
+        {
+          "vulnerable": ">= 9.5.5, < 14.2.15",
+          "patched": "14.2.15"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-g77x-44xx-532m",
+      "cve": "CVE-2024-47831",
+      "severity": "medium",
+      "cvss": 4.6,
+      "cwes": [
+        "CWE-674"
+      ],
+      "summary": "Denial of Service condition in Next.js image optimization",
+      "published": "2024-10-14",
+      "updated": "2024-11-08",
+      "url": "https://github.com/advisories/GHSA-g77x-44xx-532m",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 14.2.7",
+          "patched": "14.2.7"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-gp8f-8m3g-qvj9",
+      "cve": "CVE-2024-46982",
+      "severity": "high",
+      "cvss": 8.7,
+      "cwes": [
+        "CWE-349",
+        "CWE-639"
+      ],
+      "summary": "Next.js Cache Poisoning",
+      "published": "2024-09-17",
+      "updated": "2024-09-18",
+      "url": "https://github.com/advisories/GHSA-gp8f-8m3g-qvj9",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.5.1, < 13.5.7",
+          "patched": "13.5.7"
+        },
+        {
+          "vulnerable": ">= 14.0.0, < 14.2.10",
+          "patched": "14.2.10"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-fq54-2j52-jc42",
+      "cve": "CVE-2024-39693",
+      "severity": "high",
+      "cvss": 8.7,
+      "cwes": [
+        "CWE-400"
+      ],
+      "summary": "Next.js Denial of Service (DoS) condition",
+      "published": "2024-07-10",
+      "updated": "2024-11-06",
+      "url": "https://github.com/advisories/GHSA-fq54-2j52-jc42",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.3.1, < 13.5.0",
+          "patched": "13.5.0"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-77r5-gw3j-2mpf",
+      "cve": "CVE-2024-34350",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-444"
+      ],
+      "summary": "Next.js Vulnerable to HTTP Request Smuggling",
+      "published": "2024-05-09",
+      "updated": "2024-07-09",
+      "url": "https://github.com/advisories/GHSA-77r5-gw3j-2mpf",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.0, < 13.5.1",
+          "patched": "13.5.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-fr5h-rqp8-mj6g",
+      "cve": "CVE-2024-34351",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-918"
+      ],
+      "summary": "Next.js Server-Side Request Forgery in Server Actions",
+      "published": "2024-05-09",
+      "updated": "2024-05-14",
+      "url": "https://github.com/advisories/GHSA-fr5h-rqp8-mj6g",
+      "ranges": [
+        {
+          "vulnerable": ">= 13.4.0, < 14.1.1",
+          "patched": "14.1.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-c59h-r6p8-q9wc",
+      "cve": "CVE-2023-46298",
+      "severity": "low",
+      "cvss": null,
+      "cwes": [],
+      "summary": "Next.js missing cache-control header may lead to CDN caching empty reply",
+      "published": "2023-10-22",
+      "updated": "2023-11-09",
+      "url": "https://github.com/advisories/GHSA-c59h-r6p8-q9wc",
+      "ranges": [
+        {
+          "vulnerable": ">= 0.9.9, < 13.4.20-canary.13",
+          "patched": "13.4.20-canary.13"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-wff4-fpwg-qqv3",
+      "cve": "CVE-2022-36046",
+      "severity": "medium",
+      "cvss": 5.3,
+      "cwes": [
+        "CWE-248",
+        "CWE-754"
+      ],
+      "summary": "Unexpected server crash in Next.js",
+      "published": "2022-08-30",
+      "updated": "2023-01-29",
+      "url": "https://github.com/advisories/GHSA-wff4-fpwg-qqv3",
+      "ranges": [
+        {
+          "vulnerable": "= 12.2.3",
+          "patched": "12.2.4"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-fmvm-x8mv-47mj",
+      "cve": "CVE-2022-23646",
+      "severity": "medium",
+      "cvss": 5.9,
+      "cwes": [
+        "CWE-451"
+      ],
+      "summary": "Improper CSP in Image Optimization API for Next.js versions between 10.0.0 and 12.1.0",
+      "published": "2022-02-17",
+      "updated": "2023-02-03",
+      "url": "https://github.com/advisories/GHSA-fmvm-x8mv-47mj",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 12.1.0",
+          "patched": "12.1.0"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-wr66-vrwm-5g5x",
+      "cve": "CVE-2022-21721",
+      "severity": "medium",
+      "cvss": 5.9,
+      "cwes": [
+        "CWE-20",
+        "CWE-400"
+      ],
+      "summary": "Denial of Service Vulnerability in next.js",
+      "published": "2022-01-28",
+      "updated": "2023-12-20",
+      "url": "https://github.com/advisories/GHSA-wr66-vrwm-5g5x",
+      "ranges": [
+        {
+          "vulnerable": ">= 12.0.0, < 12.0.9",
+          "patched": "12.0.9"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-25mp-g6fv-mqxx",
+      "cve": "CVE-2021-43803",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-20"
+      ],
+      "summary": "Unexpected server crash in Next.js.",
+      "published": "2021-12-07",
+      "updated": "2024-03-13",
+      "url": "https://github.com/advisories/GHSA-25mp-g6fv-mqxx",
+      "ranges": [
+        {
+          "vulnerable": ">= 12.0.0, < 12.0.5",
+          "patched": "12.0.5"
+        },
+        {
+          "vulnerable": ">= 0.9.9, < 11.1.3",
+          "patched": "11.1.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-9gr3-7897-pp7m",
+      "cve": "CVE-2021-39178",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-79"
+      ],
+      "summary": "XSS in Image Optimization API for Next.js",
+      "published": "2021-09-01",
+      "updated": "2023-03-31",
+      "url": "https://github.com/advisories/GHSA-9gr3-7897-pp7m",
+      "ranges": [
+        {
+          "vulnerable": ">= 10.0.0, < 11.1.1",
+          "patched": "11.1.1"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-vxf5-wxwp-m7g9",
+      "cve": "CVE-2021-37699",
+      "severity": "medium",
+      "cvss": 6.9,
+      "cwes": [
+        "CWE-601"
+      ],
+      "summary": "Open Redirect in Next.js",
+      "published": "2021-08-12",
+      "updated": "2023-02-01",
+      "url": "https://github.com/advisories/GHSA-vxf5-wxwp-m7g9",
+      "ranges": [
+        {
+          "vulnerable": ">= 0.9.9, < 11.1.0",
+          "patched": "11.1.0"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-x56p-c8cg-q435",
+      "cve": "CVE-2020-15242",
+      "severity": "medium",
+      "cvss": 4.7,
+      "cwes": [
+        "CWE-601"
+      ],
+      "summary": "Open Redirect in Next.js versions",
+      "published": "2020-10-08",
+      "updated": "2023-01-09",
+      "url": "https://github.com/advisories/GHSA-x56p-c8cg-q435",
+      "ranges": [
+        {
+          "vulnerable": ">= 9.5.0, < 9.5.4",
+          "patched": "9.5.4"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-5vj8-3v2h-h38v",
+      "cve": null,
+      "severity": "high",
+      "cvss": null,
+      "cwes": [
+        "CWE-20"
+      ],
+      "summary": "Remote Code Execution in next",
+      "published": "2020-09-04",
+      "updated": "2023-01-09",
+      "url": "https://github.com/advisories/GHSA-5vj8-3v2h-h38v",
+      "ranges": [
+        {
+          "vulnerable": ">= 0.9.9, < 5.1.0",
+          "patched": "5.1.0"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-fq77-7p7r-83rj",
+      "cve": "CVE-2020-5284",
+      "severity": "medium",
+      "cvss": 4.4,
+      "cwes": [
+        "CWE-23"
+      ],
+      "summary": "Directory Traversal in Next.js",
+      "published": "2020-03-30",
+      "updated": "2025-09-26",
+      "url": "https://github.com/advisories/GHSA-fq77-7p7r-83rj",
+      "ranges": [
+        {
+          "vulnerable": ">= 0.9.9, < 9.3.2",
+          "patched": "9.3.2"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-qw96-mm2g-c8m7",
+      "cve": "CVE-2018-18282",
+      "severity": "medium",
+      "cvss": 6.1,
+      "cwes": [
+        "CWE-79"
+      ],
+      "summary": "Next.js has cross site scripting (XSS) vulnerability via the 404 or 500 /_error page",
+      "published": "2018-10-15",
+      "updated": "2023-01-09",
+      "url": "https://github.com/advisories/GHSA-qw96-mm2g-c8m7",
+      "ranges": [
+        {
+          "vulnerable": ">= 7.0.0, < 7.0.2",
+          "patched": "7.0.2"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-m34x-wgrh-g897",
+      "cve": "CVE-2018-6184",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Directory traversal vulnerability in Next.js",
+      "published": "2018-01-24",
+      "updated": "2023-01-09",
+      "url": "https://github.com/advisories/GHSA-m34x-wgrh-g897",
+      "ranges": [
+        {
+          "vulnerable": ">= 1.0.0, < 4.2.3",
+          "patched": "4.2.3"
+        }
+      ]
+    },
+    {
+      "ghsa": "GHSA-3f5c-4qxj-vmpf",
+      "cve": "CVE-2017-16877",
+      "severity": "high",
+      "cvss": 7.5,
+      "cwes": [
+        "CWE-22"
+      ],
+      "summary": "Next.js Directory Traversal Vulnerability",
+      "published": "2017-12-05",
+      "updated": "2024-04-22",
+      "url": "https://github.com/advisories/GHSA-3f5c-4qxj-vmpf",
+      "ranges": [
+        {
+          "vulnerable": ">= 1.0.0, < 2.4.1",
+          "patched": "2.4.1"
+        }
+      ]
+    }
+  ]
+}
