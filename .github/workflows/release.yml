@@ -1,13 +1,33 @@
-# A tag vX.Y.Z builds the binaries here, on GitHub's runners, and attests each one: `gh attestation verify` proves a
-# download came from this workflow in this repository. Actions are pinned by commit.
+# A tag vX.Y.Z tests on every operating system, builds the binaries on GitHub's runners, and attests each one:
+# `gh attestation verify` proves a download came from this workflow in this repository. Actions are pinned by commit.
 name: release
 on:
   push:
     tags: ["v*"]
 permissions: {}
 jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025, windows-11-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - run: go vet ./...
+      - run: go test ./...
   release:
+    needs: test
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     permissions:
       contents: write
       id-token: write
@@ -16,15 +36,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          bun-version: 1.4.4
-      - run: bun install --frozen-lockfile
+          go-version-file: go.mod
       - name: The tag is the program's version
-        run: test "$(bun apps/cli/src/main.ts --version)" = "${GITHUB_REF_NAME#v}"
-      - run: bunx tsc --noEmit
-      - run: bun test
-      - run: bun run build
+        run: test "$(go run . --version)" = "${GITHUB_REF_NAME#v}"
+      - run: sh scripts/build.sh
+      - name: The binary runs
+        run: |
+          chmod +x dist/cli/rasoat-linux-x64
+          dist/cli/rasoat-linux-x64 scan fixtures/npm --offline --json > report.json || test $? = 1
+          grep -q '"version": "14.2.3"' report.json
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/cli/rasoat-*

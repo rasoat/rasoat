@@ -1,10 +1,10 @@
 {
   "name": "rasoat",
-  "description": "Scan a project or site for vulnerable Next.js, WordPress core, Node.js, PHP and Bun versions, then upgrade and rescan. Read-only tools; the fix stays in your hands.",
-  "version": "0.2.1",
+  "description": "Scan a project, a site or a Linux machine for vulnerable versions (Next.js, WordPress core, Node.js, PHP, Bun, the kernel, distro packages), then upgrade and rescan. Read-only tools; the fix stays in your hands.",
+  "version": "0.3.3",
   "author": { "name": "Rà Soát editors", "email": "editors@rasoat.com" },
   "homepage": "https://rasoat.com",
   "repository": "https://github.com/rasoat/rasoat",
   "license": "Apache-2.0",
-  "keywords": ["security", "vulnerabilities", "nextjs", "wordpress", "mcp"]
+  "keywords": ["security", "vulnerabilities", "nextjs", "wordpress", "linux", "kernel", "mcp"]
 }

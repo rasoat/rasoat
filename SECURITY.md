@@ -1,6 +1,6 @@
 # Security
 
-Write to editors@rasoat.com if you find a way to make `rasoat` run project code, write outside its cache, send project
+Write to editors@rasoat.com if you find a way to make `rasoat` run project code or any command, write outside its cache, send project
 data anywhere, report a vulnerable version as clean, or make `rasoat mcp` read a private address or carry anything but a
 plain version into a command. Please do not open a public issue for these.
 

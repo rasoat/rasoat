@@ -1,0 +1,2 @@
+# Tests compare bytes: no line-ending conversion, on any OS.
+* -text

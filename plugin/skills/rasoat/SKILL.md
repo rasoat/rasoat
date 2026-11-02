@@ -1,6 +1,6 @@
 ---
 name: rasoat
-description: Check a project's or site's Next.js, WordPress core, Node.js, PHP and Bun versions against published vulnerabilities, then plan and verify the upgrade. Use when the user asks whether their site, project or dependencies are vulnerable, asks about a CVE or GHSA in these products, or wants to upgrade one of them for security. Also for "kiểm tra bảo mật", "rà soát lỗ hổng", "có bị lỗi bảo mật không".
+description: Check a project's or site's Next.js, WordPress core, Node.js, PHP and Bun versions, or a Linux machine's distro release, kernel and packages, against published vulnerabilities, then plan and verify the upgrade. Use when the user asks whether their site, project, server or dependencies are vulnerable, asks about a CVE or GHSA in these products, or wants to upgrade one of them for security. Also for "kiểm tra bảo mật", "rà soát lỗ hổng", "có bị lỗi bảo mật không".
 ---
 
 # Scan, plan, upgrade, rescan
@@ -25,10 +25,27 @@ Answer in the user's language.
 
 The tools never change anything. The fix is yours to apply and the user's to approve.
 
+## A Linux machine
+
+Call the `host` tool, with no target: it reads the machine the server runs on. To judge another machine, run `rasoat` on it;
+the tool cannot be pointed elsewhere.
+
+- `results` has the distro release, the kernel (`product: "linux"`), and one row per source package with a published fix it
+  lacks (`product: "pkg:openssl"`, `sources` naming the binary packages).
+- `host.upgrade_command` upgrades what is listed. Show it and get consent first: it can restart services. On production,
+  suggest a staging machine or a maintenance window.
+- `host.reboot_needed`: a newer kernel is installed but not running, so the fix is not in effect until a reboot. Say so plainly.
+- `host.open_no_fix` counts published CVEs with no fix yet. They are not findings, and there is nothing to upgrade to.
+- A kernel `unknown` with `reason: "vendor-kernel"`: a vendor's build no package here explains. Do not judge it from its
+  number, because backports make the number say nothing. Tell the user to ask that vendor.
+- `host.in_container: true`: the kernel belongs to the container's host. Tell the user to run this on the host.
+- A release `unsupported` means its distro stopped publishing fixes: a clean package list means little there.
+
 ## Say what it does not cover
 
 A clean result covers only the versions it lists. Read `not_checked` and repeat it: WordPress plugins and themes (where
-most WordPress holes are), other dependencies, other frameworks. Never call a project "safe". Say "no published advisory
+most WordPress holes are), other dependencies, other frameworks; on a machine, software outside the package manager and
+whether a flaw is reachable there. Never call a project or a machine "safe". Say "no published advisory
 reaches these versions, in data from `data.built`". If `data.stale` is true or `data.problem` is set, say that too.
 
 | `exit_code` | Meaning |
@@ -53,7 +70,8 @@ They need the `rasoat` program on `PATH`. Check with `rasoat --version`. If it i
 a binary, then:
 
 ```sh
-# Pick one: darwin-arm64, darwin-x64, linux-x64, linux-arm64, windows-x64.exe
+# Pick one: linux-x64, linux-arm64, linux-armv7, linux-386, linux-riscv64, linux-ppc64le, linux-s390x, darwin-arm64,
+# darwin-x64, windows-x64.exe, windows-arm64.exe, freebsd-x64
 A=darwin-arm64
 curl -fsSLO "https://github.com/rasoat/rasoat/releases/latest/download/rasoat-$A"
 curl -fsSLO https://github.com/rasoat/rasoat/releases/latest/download/SHA256SUMS
@@ -62,7 +80,7 @@ gh attestation verify "rasoat-$A" --repo rasoat/rasoat   # needs the GitHub CLI:
 chmod +x "rasoat-$A" && mkdir -p ~/.local/bin && mv "rasoat-$A" ~/.local/bin/rasoat
 ```
 
-The binaries are about 100 MB and are not Apple-notarized, so a browser download on macOS gets a warning. After the
+The binaries are about 8 MB, static, and not Apple-notarized, so a browser download on macOS gets a warning. After the
 install, the tools appear when the MCP server reconnects (or in a new session). Until then the terminal gives the same
 report: `rasoat scan <target> --json`. It has no fix plan, so use the report's `fix` field per result.
 

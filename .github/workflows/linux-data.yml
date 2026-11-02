@@ -1,0 +1,60 @@
+# The Linux advisory files `rasoat host` downloads, rebuilt daily from public sources and attested, on a release of their own
+# that never becomes "latest". Then the fresh files judge this runner, a real machine with a real kernel. A push that changes
+# the builder or this file rebuilds at once.
+name: linux-data
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["cmd/linux-data/**", ".github/workflows/linux-data.yml"]
+permissions: {}
+concurrency:
+  group: linux-data
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: The kernel's own CVE records
+        run: git clone -q --depth 1 https://git.kernel.org/pub/scm/linux/security/vulns.git "$RUNNER_TEMP/kernel-vulns"
+      - run: go run ./cmd/linux-data --work "$RUNNER_TEMP/osv" --out dist/linux-data --kernel-vulns "$RUNNER_TEMP/kernel-vulns"
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/linux-data/*
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view linux-data --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1 ||
+            gh release create linux-data --repo "$GITHUB_REPOSITORY" --latest=false --prerelease --title "Linux advisory data" --notes "Rebuilt daily from public sources, reduced to package, id, fixed version and severity. Read by rasoat host. Each file's first line names its source and terms: Ubuntu and Alpine files are CC-BY-SA-4.0, Red Hat CC-BY-4.0, AlmaLinux MIT, Rocky Linux BSD. The program is under the other releases, Apache-2.0."
+          gh release upload linux-data dist/linux-data/* --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Judge this runner with what was published
+        run: |
+          go build -o rasoat .
+          ./rasoat host --json --all > report.json || test $? = 1
+          python3 - <<'PY'
+          import json, subprocess
+          r = json.load(open("report.json"))
+          h = r["host"]
+          kernel = subprocess.check_output(["uname", "-r"], text=True).strip()
+          pkgs = subprocess.check_output("dpkg-query -W -f='${db:Status-Status}\n' | grep -c '^installed$'", shell=True, text=True).strip()
+          print({k: h[k] for k in ("distro", "packages", "kernel_running", "kernel_newest", "reboot_needed", "open_no_fix")}, r["summary"], r["data"])
+          print([ (x["product"], x["version"], x["status"], x["how"]) for x in r["results"] if not x["product"].startswith("pkg:")])
+          assert h["kernel_running"] == kernel, (h["kernel_running"], kernel)
+          assert str(h["packages"]) == pkgs, (h["packages"], pkgs)
+          assert r["data"]["origin"] == "downloaded" and not r["data"]["stale"], r["data"]
+          linux = [x for x in r["results"] if x["product"] == "linux"]
+          assert linux and linux[0]["how"].startswith("package "), linux
+          PY
