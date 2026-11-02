@@ -38,7 +38,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release view linux-data --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1 ||
-            gh release create linux-data --repo "$GITHUB_REPOSITORY" --latest=false --prerelease --title "Linux advisory data" --notes "Rebuilt daily from public sources, reduced to package, id, fixed version and severity. Read by rasoat host. Each file's first line names its source and terms: Ubuntu and Alpine files are CC-BY-SA-4.0, Red Hat CC-BY-4.0, AlmaLinux MIT, Rocky Linux BSD. The program is under the other releases, Apache-2.0."
+            gh release create linux-data --repo "$GITHUB_REPOSITORY" --latest=false --prerelease --title "Linux advisory data" --notes "Rebuilt daily from public sources, reduced to package, id, fixed version and severity. Read by rasoat host. Each file's first line names its source, licence and links; NOTICE.txt repeats them. Ubuntu and Alpine files are CC-BY-SA-4.0, Red Hat CC-BY-4.0, AlmaLinux MIT, Rocky Linux BSD; Debian and SUSE publish no licence with their data, and NOTICE.txt says so. The program is under the other releases, Apache-2.0."
           gh release upload linux-data dist/linux-data/* --repo "$GITHUB_REPOSITORY" --clobber
       - name: Judge this runner with what was published
         run: |

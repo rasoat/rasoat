@@ -8,6 +8,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"compress/gzip"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -282,26 +283,69 @@ func reduce(entries []entry) []entry {
 	return out
 }
 
-// sourceOf is where a file's data comes from and its terms, carried in the file. These files are adapted data, published
-// under the same terms; the program is not built from them and keeps its own licence.
-func sourceOf(id string) (source, license string) {
-	switch {
-	case strings.HasPrefix(id, "ubuntu-"):
-		return "Canonical, ubuntu-security-notices, through OSV.dev", "CC-BY-SA-4.0"
-	case strings.HasPrefix(id, "alpine-"):
-		return "Alpine SecDB, through OSV.dev", "CC-BY-SA-4.0"
-	case strings.HasPrefix(id, "rhel-"):
-		return "Red Hat Security Data, through OSV.dev", "CC-BY-4.0"
-	case strings.HasPrefix(id, "almalinux-"):
-		return "AlmaLinux errata, through OSV.dev", "MIT"
-	case strings.HasPrefix(id, "rocky-"):
-		return "Rocky Linux errata, through OSV.dev", "BSD"
-	case strings.HasPrefix(id, "debian-"):
-		return "Debian Security Tracker, through OSV.dev", "as published by Debian"
-	case strings.HasPrefix(id, "sles-"), strings.HasPrefix(id, "opensuse-"):
-		return "SUSE security data, through OSV.dev", "as published by SUSE"
+// Terms is where a data file comes from, its licence and where that licence is stated. The table lives in terms.json so
+// the file header and NOTICE.txt are one knowledge, not two copies.
+type Terms struct {
+	Prefix     string `json:"prefix"`
+	Source     string `json:"source"`
+	SourceURL  string `json:"sourceUrl"`
+	License    string `json:"license"`
+	LicenseURL string `json:"licenseUrl"`
+}
+
+type termsFile struct {
+	Changes string  `json:"changes"`
+	Sources []Terms `json:"sources"`
+}
+
+//go:embed terms.json
+var termsJSON []byte
+
+var terms = func() termsFile {
+	var t termsFile
+	if err := json.Unmarshal(termsJSON, &t); err != nil {
+		panic("terms.json: " + err.Error())
 	}
-	return "kernel.org CVE records (vulns.git)", "CVE-ToU"
+	return t
+}()
+
+// sourceOf is the terms of the file with this id. The last entry has no prefix and covers the kernel.
+func sourceOf(id string) Terms {
+	for _, t := range terms.Sources {
+		if strings.HasPrefix(id, t.Prefix) && t.Prefix != "" {
+			return t
+		}
+	}
+	return terms.Sources[len(terms.Sources)-1]
+}
+
+// writeNotice writes the attribution every published file needs: source, licence, link, and what was changed. The adapted
+// files stay under their source terms; the program is built from none of them and keeps its own licence.
+func writeNotice(out string) error {
+	var b strings.Builder
+	b.WriteString("Linux advisory data used by rasoat host\n\n")
+	b.WriteString("Built from public vulnerability data, reduced to the package, the advisory id, the fixed version and the\n")
+	b.WriteString("severity. No advisory prose is included. " + terms.Changes + "\n\n")
+	b.WriteString("Each data file repeats its source and terms in the first line. This list is the same table.\n\n")
+	for _, t := range terms.Sources {
+		if t.Prefix == "" {
+			continue
+		}
+		fmt.Fprintf(&b, "%-12s %s\n             %s\n", strings.TrimSuffix(t.Prefix, "-"), t.Source, t.SourceURL)
+		if t.LicenseURL != "" {
+			fmt.Fprintf(&b, "             %s: %s\n", t.License, t.LicenseURL)
+		} else {
+			fmt.Fprintf(&b, "             licence: %s\n", t.License)
+		}
+		b.WriteString("\n")
+	}
+	k := terms.Sources[len(terms.Sources)-1]
+	fmt.Fprintf(&b, "%-12s %s\n             %s\n             %s: %s\n\n", "linux-kernel", k.Source, k.SourceURL, k.License, k.LicenseURL)
+	b.WriteString("The Ubuntu and Alpine files are adapted material under CC-BY-SA-4.0 and stay under that licence. The\n")
+	b.WriteString("program in the other releases is Apache-2.0 and is not built from these files. Debian and SUSE publish no\n")
+	b.WriteString("licence with their data; this notice says so rather than claim one. The data is not affiliated with, or\n")
+	b.WriteString("endorsed by, any of these projects. Linux is a registered trademark of Linus Torvalds.\n")
+	return os.WriteFile(filepath.Join(out, "NOTICE.txt"), []byte(b.String()), 0o644)
 }
 
 func clean(s string) string { return strings.NewReplacer("\t", " ", "\n", " ", "\r", " ").Replace(s) }
@@ -329,8 +373,8 @@ func writeRelease(path, id, built string, rel *release) (int, error) {
 		}
 	}
 	sort.Strings(names)
-	source, license := sourceOf(id)
-	head, _ := json.Marshal(map[string]any{"format": 1, "id": id, "built": built, "records": count, "source": source, "license": license})
+	t := sourceOf(id)
+	head, _ := json.Marshal(map[string]any{"format": 1, "id": id, "built": built, "records": count, "source": t.Source, "sourceUrl": t.SourceURL, "license": t.License, "licenseUrl": t.LicenseURL, "changes": terms.Changes})
 	w.Write(head)
 	w.WriteByte('\n')
 	for _, n := range names {
@@ -441,8 +485,8 @@ func kernel(dir, path, built string) (int, error) {
 			}
 		}
 	}
-	source, license := sourceOf("linux-kernel")
-	head, _ := json.Marshal(map[string]any{"format": 1, "id": "linux-kernel", "built": built, "records": len(lines), "source": source, "license": license})
+	t := sourceOf("linux-kernel")
+	head, _ := json.Marshal(map[string]any{"format": 1, "id": "linux-kernel", "built": built, "records": len(lines), "source": t.Source, "sourceUrl": t.SourceURL, "license": t.License, "licenseUrl": t.LicenseURL, "changes": terms.Changes})
 	w.Write(head)
 	w.WriteByte('\n')
 	for _, l := range lines {
@@ -571,6 +615,9 @@ func run(work, out, only, vulns string) error {
 		return err
 	}
 	if err := os.WriteFile(filepath.Join(out, "index.json"), index, 0o644); err != nil {
+		return err
+	}
+	if err := writeNotice(out); err != nil {
 		return err
 	}
 	ids := make([]string, 0, len(files))

@@ -48,7 +48,7 @@ type Host struct {
 }
 
 // Notices are what the Linux data asks to be shown.
-var Notices = []string{"Linux advisories, through OSV.dev: Ubuntu and Alpine (CC-BY-SA-4.0), Red Hat (CC-BY-4.0), AlmaLinux (MIT), Rocky Linux (BSD), Debian, SUSE. Upstream kernel: kernel.org. Release lines: endoflife.date. Each data file names its source and terms. Not affiliated with any of them. Linux is a registered trademark of Linus Torvalds."}
+var Notices = []string{"Linux advisories, through OSV.dev: Ubuntu and Alpine (CC-BY-SA-4.0), Red Hat (CC-BY-4.0), AlmaLinux (MIT), Rocky Linux (BSD), Debian and SUSE (no licence published at the source). Upstream kernel: kernel.org (CVE-ToU). Release lines: endoflife.date. Each data file names its source, terms and links; NOTICE.txt in the data release repeats them. Not affiliated with any of them. Linux is a registered trademark of Linus Torvalds."}
 
 // ErrNotLinux: no os-release under this root.
 var ErrNotLinux = errors.New("no /etc/os-release under this root: not a Linux root")

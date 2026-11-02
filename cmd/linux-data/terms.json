@@ -1,0 +1,68 @@
+{
+  "changes": "Adapted to a table of the package, the advisory id, the fixed version and the severity. Advisory prose, references, reporter credits and unaffected package lists are removed.",
+  "sources": [
+    {
+      "prefix": "ubuntu-",
+      "source": "Canonical, ubuntu-security-notices, through OSV.dev",
+      "sourceUrl": "https://github.com/canonical/ubuntu-security-notices",
+      "license": "CC-BY-SA-4.0",
+      "licenseUrl": "https://github.com/canonical/ubuntu-security-notices/blob/main/LICENSE"
+    },
+    {
+      "prefix": "alpine-",
+      "source": "Alpine SecDB, through OSV.dev",
+      "sourceUrl": "https://secdb.alpinelinux.org/",
+      "license": "CC-BY-SA-4.0",
+      "licenseUrl": "https://secdb.alpinelinux.org/license.txt"
+    },
+    {
+      "prefix": "rhel-",
+      "source": "Red Hat Security Data, through OSV.dev",
+      "sourceUrl": "https://access.redhat.com/security/data",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "prefix": "almalinux-",
+      "source": "AlmaLinux errata, through OSV.dev",
+      "sourceUrl": "https://github.com/AlmaLinux/osv-database",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/AlmaLinux/osv-database/blob/master/LICENSE"
+    },
+    {
+      "prefix": "rocky-",
+      "source": "Rocky Linux errata, through OSV.dev",
+      "sourceUrl": "https://distro-tools.rocky.page/apollo/openapi/#osv",
+      "license": "BSD",
+      "licenseUrl": "https://rockylinux.org/licensing"
+    },
+    {
+      "prefix": "debian-",
+      "source": "Debian Security Tracker, through OSV.dev",
+      "sourceUrl": "https://security-tracker.debian.org/tracker/",
+      "license": "not stated at the source",
+      "licenseUrl": ""
+    },
+    {
+      "prefix": "sles-",
+      "source": "SUSE security data, through OSV.dev",
+      "sourceUrl": "https://ftp.suse.com/pub/projects/security/osv/",
+      "license": "not stated at the source",
+      "licenseUrl": ""
+    },
+    {
+      "prefix": "opensuse-",
+      "source": "SUSE security data, through OSV.dev",
+      "sourceUrl": "https://ftp.suse.com/pub/projects/security/osv/",
+      "license": "not stated at the source",
+      "licenseUrl": ""
+    },
+    {
+      "prefix": "",
+      "source": "kernel.org CVE records (vulns.git)",
+      "sourceUrl": "https://git.kernel.org/pub/scm/linux/security/vulns.git",
+      "license": "CVE-ToU",
+      "licenseUrl": "https://www.cve.org/Legal/TermsOfUse"
+    }
+  ]
+}
