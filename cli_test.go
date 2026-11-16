@@ -40,7 +40,7 @@ type out struct {
 func rasoat(t *testing.T, cache string, env map[string]string, stdin string, args ...string) out {
 	t.Helper()
 	cmd := exec.Command(os.Args[0], args...)
-	vars := map[string]string{"RASOAT_TEST_SELF": "1", "XDG_CACHE_HOME": cache, "RASOAT_DATA_URL": nowhere, "LC_ALL": "", "LC_MESSAGES": "", "LANG": "en_US.UTF-8"}
+	vars := map[string]string{"RASOAT_TEST_SELF": "1", "XDG_CACHE_HOME": cache, "RASOAT_DATA_URL": nowhere, "RASOAT_LINUX_DATA_URL": nowhere, "LC_ALL": "", "LC_MESSAGES": "", "LANG": "en_US.UTF-8"}
 	for k, v := range env {
 		vars[k] = v
 	}
