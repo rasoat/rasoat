@@ -55,7 +55,18 @@ type Source struct {
 // fetchCached returns the file's bytes as cached, downloading at most once a day. check decides whether a download is good
 // and is given the cached bytes, if any, to judge it against: a file older than the cache, or one that lost records, loses.
 func fetchCached(name string, offline bool, userAgent string, parse func([]byte) (built string, records int, ok bool)) ([]byte, Source) {
-	file := filepath.Join(data.CacheDir(), "linux", strings.TrimSuffix(name, ".gz"))
+	return fetch(name, offline, false, userAgent, parse)
+}
+
+// cacheFile is where a published file is kept, decompressed.
+func cacheFile(name string) string {
+	return filepath.Join(data.CacheDir(), "linux", strings.TrimSuffix(name, ".gz"))
+}
+
+// fetch is fetchCached; force downloads even when the cache is under a day old. The same checks decide whether the
+// download is used.
+func fetch(name string, offline, force bool, userAgent string, parse func([]byte) (built string, records int, ok bool)) ([]byte, Source) {
+	file := cacheFile(name)
 	var src Source
 	cached, err := os.ReadFile(file)
 	haveBuilt, haveRecords := "", 0
@@ -72,7 +83,7 @@ func fetchCached(name string, offline bool, userAgent string, parse func([]byte)
 	if offline {
 		return cached, src
 	}
-	if st, err := os.Stat(file); err == nil && cached != nil && time.Since(st.ModTime()) < 24*time.Hour {
+	if st, err := os.Stat(file); err == nil && !force && cached != nil && time.Since(st.ModTime()) < 24*time.Hour {
 		return cached, src
 	}
 	body, ok := data.Fetch(BaseURL()+name, userAgent, maxDownload)
@@ -158,6 +169,52 @@ func LoadFile(id string, offline bool, userAgent string) ([]byte, Source) {
 		return nil, src
 	}
 	return b[bytes.IndexByte(b, '\n')+1:], src
+}
+
+// parserFor is the check a published file name is held to.
+func parserFor(name string) func([]byte) (string, int, bool) {
+	if name == "index.json" {
+		return parseIndex
+	}
+	return parseHead(strings.TrimSuffix(name, ".tsv.gz"))
+}
+
+// Cached is what the cache holds of one published file. Records: the index counts its files.
+type Cached struct {
+	Path    string
+	Built   string
+	Records int
+}
+
+// Inspect reads the cache and nothing else: ok is false when there is no good copy. name is the published name:
+// index.json, eco-npm.tsv.gz.
+func Inspect(name string) (Cached, bool) {
+	file := cacheFile(name)
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return Cached{Path: file}, false
+	}
+	built, records, ok := parserFor(name)(b)
+	return Cached{file, built, records}, ok
+}
+
+// CachedNames are the published names of the data files in the cache, the index apart, sorted.
+func CachedNames() []string {
+	entries, _ := os.ReadDir(filepath.Join(data.CacheDir(), "linux"))
+	var out []string
+	for _, e := range entries {
+		if id, ok := strings.CutSuffix(e.Name(), ".tsv"); ok && e.Type().IsRegular() {
+			out = append(out, id+".tsv.gz")
+		}
+	}
+	return out
+}
+
+// Refresh downloads one published file now and keeps it if it passes the checks LoadFile holds a download to: Source
+// says what came of it.
+func Refresh(name, userAgent string) Source {
+	_, src := fetch(name, false, true, userAgent, parserFor(name))
+	return src
 }
 
 // Fixed is one published fix for a package.

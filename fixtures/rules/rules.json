@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "images": {
+    "bitnami/redis": "family:redis",
+    "grafana/loki": "family:loki-not-in-the-index",
+    "minio/minio": "none",
+    "axllent/mailpit": "none"
+  },
+  "detectors": [
+    { "name": "app-version", "files": ["VERSION", "*.version"], "regex": "^(\\d+\\.\\d+\\.\\d+)$", "product": "pkg:npm/lodash" },
+    { "name": "cache-version", "files": ["cache.version"], "regex": "^redis=(\\d+\\.\\d+\\.\\d+)$", "product": "family:redis" },
+    { "name": "build-stamp", "files": ["BUILD"], "regex": "^build (\\d+)$", "product": "none" }
+  ]
+}

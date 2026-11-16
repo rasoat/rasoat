@@ -1,0 +1,1 @@
+{ "version": 1, "detectors": [ { "name": "x", "files": ["VERSION"], "regex": "^(\\d+)$", "product": "pip:requests" } ] }

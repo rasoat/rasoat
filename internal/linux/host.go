@@ -20,6 +20,7 @@ type Options struct {
 	Offline   bool
 	UserAgent string
 	Today     string
+	Snapshot  func() *core.Snapshot // the product verdicts; asked for only when a vendor PHP or Node package needs them
 }
 
 // Finding is the result for one thing on the host: the release, the kernel, or a source package.
@@ -230,14 +231,19 @@ func Scan(o Options) (*Host, error) {
 		}
 	}
 	h.Packages = len(pkgs)
+	assignOrigins(o.Root, d.Family, pkgs)
 
 	groups := map[string]*group{}
-	var images []Package
+	var images, vendorPkgs []Package
 	for _, p := range pkgs {
 		if isKernelBinary(d.Family, p.Name) {
 			if isImage, _ := kernelImage(d.Family, p); isImage {
 				images = append(images, p)
 			}
+			continue
+		}
+		if p.Vendor != "" { // not the distro's build: its advisories say nothing about it
+			vendorPkgs = append(vendorPkgs, p)
 			continue
 		}
 		key := p.Source + " " + p.SourceVersion
@@ -342,6 +348,13 @@ func Scan(o Options) (*Host, error) {
 			}
 			h.Findings = append(h.Findings, f)
 		}
+	}
+	// Vendor builds are judged as the product they are, whether or not the distro's data loaded.
+	if len(vendorPkgs) > 0 {
+		rows, notes, up := judgeVendors(vendorPkgs, index, o)
+		h.Findings = append(h.Findings, rows...)
+		h.Notes = append(h.Notes, notes...)
+		upgrade = append(upgrade, up...)
 	}
 	h.UpgradeCmd = upgradeCommand(d.Family, upgrade)
 

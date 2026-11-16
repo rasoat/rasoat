@@ -1,7 +1,8 @@
-// linux-data builds the Linux advisory files `rasoat host` downloads: one small file per distro release, one for the
-// upstream kernel, one index. From public sources only, with no advisory prose: package, id, fixed version, severity.
+// linux-data builds the advisory files the CLI downloads: one small file per distro release for `rasoat host`, one for the
+// upstream kernel, one per language ecosystem (npm, crates.io, Go) for `rasoat scan`, one index. From public sources only,
+// with no advisory prose: package, id, fixed version, severity.
 //
-// Usage: go run ./cmd/linux-data --work DIR --out DIR [--only Debian,Alpine] [--kernel-vulns DIR]
+// Usage: go run ./cmd/linux-data --work DIR --out DIR [--only Debian,Alpine,npm,crates.io,Go] [--kernel-vulns DIR]
 package main
 
 import (
@@ -23,6 +24,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/rasoat/rasoat/internal/images"
 )
 
 const osvBase = "https://osv-vulnerabilities.storage.googleapis.com/"
@@ -83,31 +86,43 @@ func openSUSE(eco string) string {
 	return ""
 }
 
+type affected struct {
+	Package struct {
+		Name      string `json:"name"`
+		Ecosystem string `json:"ecosystem"`
+	} `json:"package"`
+	Ranges []struct {
+		Type   string `json:"type"`
+		Events []struct {
+			Introduced   string `json:"introduced"`
+			Fixed        string `json:"fixed"`
+			LastAffected string `json:"last_affected"`
+		} `json:"events"`
+	} `json:"ranges"`
+	Versions          []string `json:"versions"`
+	EcosystemSpecific struct {
+		Urgency string `json:"urgency"`
+	} `json:"ecosystem_specific"`
+	DatabaseSpecific struct {
+		CVSS          json.RawMessage `json:"cvss"`          // a vector string in RustSec, an object elsewhere
+		Informational json.RawMessage `json:"informational"` // RustSec: unmaintained, unsound, notice; else null
+	} `json:"database_specific"`
+}
+
 type record struct {
 	ID        string   `json:"id"`
 	Withdrawn string   `json:"withdrawn"`
 	Summary   string   `json:"summary"`
 	Upstream  []string `json:"upstream"`
+	Aliases   []string `json:"aliases"`
 	Severity  []struct {
 		Type  string `json:"type"`
 		Score string `json:"score"`
 	} `json:"severity"`
-	Affected []struct {
-		Package struct {
-			Name      string `json:"name"`
-			Ecosystem string `json:"ecosystem"`
-		} `json:"package"`
-		Ranges []struct {
-			Type   string `json:"type"`
-			Events []struct {
-				Introduced string `json:"introduced"`
-				Fixed      string `json:"fixed"`
-			} `json:"events"`
-		} `json:"ranges"`
-		EcosystemSpecific struct {
-			Urgency string `json:"urgency"`
-		} `json:"ecosystem_specific"`
-	} `json:"affected"`
+	DatabaseSpecific struct {
+		Severity string `json:"severity"`
+	} `json:"database_specific"`
+	Affected []affected `json:"affected"`
 }
 
 type entry struct {
@@ -294,8 +309,9 @@ type Terms struct {
 }
 
 type termsFile struct {
-	Changes string  `json:"changes"`
-	Sources []Terms `json:"sources"`
+	Changes    string  `json:"changes"`
+	Advisories []Terms `json:"advisories"` // language ecosystems: the terms follow the advisory id, not the file
+	Sources    []Terms `json:"sources"`
 }
 
 //go:embed terms.json
@@ -338,6 +354,10 @@ func writeNotice(out string) error {
 			fmt.Fprintf(&b, "             licence: %s\n", t.License)
 		}
 		b.WriteString("\n")
+	}
+	b.WriteString("Language ecosystems (eco-npm, eco-cargo, eco-go): each record keeps the terms of the source behind its id.\n\n")
+	for _, t := range terms.Advisories {
+		fmt.Fprintf(&b, "%-12s %s\n             %s\n             %s: %s\n\n", strings.TrimSuffix(t.Prefix, "-"), t.Source, t.SourceURL, t.License, t.LicenseURL)
 	}
 	k := terms.Sources[len(terms.Sources)-1]
 	fmt.Fprintf(&b, "%-12s %s\n             %s\n             %s: %s\n\n", "linux-kernel", k.Source, k.SourceURL, k.License, k.LicenseURL)
@@ -588,6 +608,31 @@ func run(work, out, only, vulns string) error {
 		fmt.Printf("%s read, %d releases so far\n", s.export, len(releases))
 	}
 	files := map[string]int{}
+	for _, s := range ecoSources {
+		if only != "" && !slices.Contains(strings.Split(only, ","), s.export) {
+			continue
+		}
+		file := filepath.Join(work, strings.ReplaceAll(s.export, " ", "_")+".zip")
+		if err := download(osvBase+url.PathEscape(s.export)+"/all.zip", file); err != nil {
+			return err
+		}
+		z, err := zip.OpenReader(file)
+		if err != nil {
+			return err
+		}
+		e := newEcoFile()
+		err = collectEco(&z.Reader, s.export, e)
+		z.Close()
+		if err != nil {
+			return err
+		}
+		n, err := writeEco(filepath.Join(out, s.id+".tsv.gz"), s.id, built, e)
+		if err != nil {
+			return err
+		}
+		files[s.id] = n
+		fmt.Printf("%s read, %d packages, %d ranges; left out for want of terms: %v\n", s.export, len(e.pkgs), n, e.skipped)
+	}
 	for id, rel := range releases {
 		n, err := writeRelease(filepath.Join(out, id+".tsv.gz"), id, built, rel)
 		if err != nil {
@@ -603,7 +648,15 @@ func run(work, out, only, vulns string) error {
 		files["linux-kernel"] = n
 	}
 	lines := map[string][]line{}
-	for _, p := range []string{"ubuntu", "debian", "rhel", "almalinux", "rocky-linux", "centos", "fedora", "amazon-linux", "oracle-linux", "alpine-linux", "opensuse", "sles", "linux"} {
+	// The distros, then every family a project's images and CI pins name (the CLI's one table): `rasoat scan` judges those
+	// by these lines.
+	products := []string{"ubuntu", "debian", "rhel", "almalinux", "rocky-linux", "centos", "fedora", "amazon-linux", "oracle-linux", "alpine-linux", "opensuse", "sles", "linux"}
+	for _, p := range images.Products() {
+		if !slices.Contains(products, p) {
+			products = append(products, p)
+		}
+	}
+	for _, p := range products {
 		l, err := endOfLife(p)
 		if err != nil {
 			return err

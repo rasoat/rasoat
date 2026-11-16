@@ -1,10 +1,15 @@
 package project
 
 import (
+	"github.com/rasoat/rasoat/internal/images"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/rasoat/rasoat/internal/core"
+	"github.com/rasoat/rasoat/internal/deps"
+	"github.com/rasoat/rasoat/internal/rules"
 )
 
 const (
@@ -19,11 +24,23 @@ var skip = map[string]bool{"node_modules": true, "vendor": true, "wp-content": t
 type Found struct {
 	Pin
 	Path string // relative to the scanned directory, with forward slashes
+	Ref  string // the image or CI pin the version came from, when it did not come from a manifest
+	Rule string // the user's detector or image rule that read it, when one did
+}
+
+// Image is an image or a CI pin of a family judged from release lines, or one that is not judged at all.
+type Image struct {
+	images.Ref
+	Path string
 }
 
 type Walked struct {
-	Found []Found
-	Notes []string // binary-bun-lock, truncated
+	Found  []Found
+	Images []Image
+	Pkgs   []deps.Pkg // every package the lockfiles resolve: npm, crates.io, Go
+	// Unresolved are the references a variable hides: also in Notes, as unresolved:<file> (<ref>).
+	Unresolved []Image
+	Notes      []string // binary-bun-lock, truncated, unresolved:<file> (<ref>)
 }
 
 func read(file string) (string, bool) {
@@ -56,7 +73,7 @@ func lockAbove(root string) []Found {
 			if text, ok := read(file); ok {
 				var out []Found
 				for _, p := range Manifests[name](text) {
-					out = append(out, Found{p, rel(root, file)})
+					out = append(out, Found{Pin: p, Path: rel(root, file)})
 				}
 				return out
 			}
@@ -69,10 +86,27 @@ func lockAbove(root string) []Found {
 	return nil
 }
 
+// workflows reads the CI pins of the workflow files directly in dir.
+func workflows(dir string, addRefs func([]images.Ref, string)) {
+	entries, _ := os.ReadDir(dir)
+	for _, e := range entries {
+		if e.Type().IsRegular() && images.IsWorkflow(e.Name()) {
+			file := filepath.Join(dir, e.Name())
+			if text, ok := read(file); ok {
+				addRefs(images.Workflow(text), file)
+			}
+		}
+	}
+}
+
 // Walk reads a directory's manifests. Text only, follows no symlink, skips what is not the project's own.
-func Walk(root string) Walked {
+func Walk(root string) Walked { return WalkWith(root, nil) }
+
+// WalkWith is Walk with the user's rules: detectors read the files they name, and an image the table does not know is
+// what the user says it is. rs is the user's own file, never anything the directory holds.
+func WalkWith(root string, rs *rules.Set) Walked {
 	var w Walked
-	w.Found, w.Notes = []Found{}, []string{}
+	w.Found, w.Images, w.Notes, w.Pkgs, w.Unresolved = []Found{}, []Image{}, []string{}, []deps.Pkg{}, []Image{}
 	note := func(n string) {
 		if !slices.Contains(w.Notes, n) {
 			w.Notes = append(w.Notes, n)
@@ -80,7 +114,59 @@ func Walk(root string) Walked {
 	}
 	add := func(ps []Pin, file string) {
 		for _, p := range ps {
-			w.Found = append(w.Found, Found{p, rel(root, file)})
+			w.Found = append(w.Found, Found{Pin: p, Path: rel(root, file)})
+		}
+	}
+	// An image of a runtime the CLI already judges is that runtime's pin; the rest wait for their release lines.
+	addRefs := func(refs []images.Ref, file string) {
+		for _, r := range refs {
+			if r.Family == nil && !r.Unresolved && r.Image != "" {
+				if ir, ok := rs.Image(r.Image); ok {
+					r = imageRule(r, ir, note)
+				}
+			}
+			switch {
+			case r.Unresolved:
+				note("unresolved:" + rel(root, file) + " (" + r.Raw + ")")
+				w.Unresolved = append(w.Unresolved, Image{r, rel(root, file)})
+			case r.Family != nil && r.Family.Core && r.Kind != images.Unpinned:
+				w.Found = append(w.Found, Found{Pin{r.Family.ID, r.Version}, rel(root, file), r.Raw, r.Rule})
+			default:
+				w.Images = append(w.Images, Image{r, rel(root, file)})
+			}
+		}
+	}
+	// detect runs one of the user's detectors on a file it names, and files what it finds where the rule says.
+	detect := func(d rules.Detector, file string) {
+		text, ok := readText(file, rules.MaxDetected)
+		if !ok {
+			return
+		}
+		v, ok := d.Detect(text)
+		if !ok {
+			return
+		}
+		switch d.Kind {
+		case rules.Pkg:
+			eco := d.Eco
+			if eco == "golang" {
+				eco = deps.Go
+			}
+			if core.ValidVersion(v) {
+				w.Pkgs = append(w.Pkgs, deps.Pkg{Eco: eco, Name: d.Product.Name, Version: v, File: rel(root, file), Rule: d.ID()})
+			}
+		case rules.Family:
+			f := images.ByID(d.Product.Name)
+			if f == nil {
+				note("rule-family-unknown:" + d.Product.Name)
+			}
+			r := images.Detected(d.ID(), v, f)
+			r.Rule = d.ID()
+			addRefs([]images.Ref{r}, file)
+		default:
+			r := images.Detected(d.ID(), v, nil)
+			r.Rule, r.Acked = d.ID(), true
+			addRefs([]images.Ref{r}, file)
 		}
 	}
 	type ranged struct {
@@ -102,11 +188,32 @@ func Walk(root string) Walked {
 		it := queue[0]
 		queue = queue[1:]
 		entries, _ := os.ReadDir(it.dir)
+		here := map[string]bool{}
+		for _, e := range entries {
+			here[e.Name()] = true
+		}
 		for _, e := range entries {
 			name, file := e.Name(), filepath.Join(it.dir, e.Name())
 			switch {
 			case e.Type().IsRegular():
-				if parse := Manifests[name]; parse != nil {
+				for _, d := range rs.For(name) {
+					detect(d, file)
+				}
+				// go.mod only where there is no go.sum: the sum lists what was downloaded, the mod what was asked for.
+				if deps.Reads(name) && !(name == "go.mod" && here["go.sum"]) {
+					if text, ok := read(file); ok {
+						w.Pkgs = append(w.Pkgs, deps.Parse(name, text, rel(root, file))...)
+					}
+				}
+				if images.IsDockerfile(name) || images.IsCompose(name) {
+					if text, ok := read(file); ok {
+						if images.IsCompose(name) {
+							addRefs(images.Compose(text), file)
+						} else {
+							addRefs(images.Dockerfile(text), file)
+						}
+					}
+				} else if parse := Manifests[name]; parse != nil {
 					if text, ok := read(file); ok {
 						add(parse(text), file)
 					}
@@ -120,7 +227,7 @@ func Walk(root string) Walked {
 					next, ps := Declared(text)
 					add(ps, file)
 					if next != "" {
-						ranges = append(ranges, ranged{Found{Pin{"next", next}, rel(root, file)}, it.dir})
+						ranges = append(ranges, ranged{Found{Pin: Pin{"next", next}, Path: rel(root, file)}, it.dir})
 					}
 				}
 			case e.IsDir():
@@ -133,6 +240,8 @@ func Walk(root string) Walked {
 					p := filepath.Join(file, "version.php")
 					text, _ := read(p)
 					add(WpVersionPhp(text), p)
+				case name == ".github":
+					workflows(filepath.Join(file, "workflows"), addRefs)
 				case it.depth < maxDepth && !skip[name] && !strings.HasPrefix(name, "."):
 					queue = append(queue, item{file, it.depth + 1})
 				}

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["cmd/linux-data/**", ".github/workflows/linux-data.yml"]
+    paths: ["cmd/linux-data/**", "internal/images/**", ".github/workflows/linux-data.yml"]
 permissions: {}
 concurrency:
   group: linux-data
@@ -57,4 +57,15 @@ jobs:
           assert r["data"]["origin"] == "downloaded" and not r["data"]["stale"], r["data"]
           linux = [x for x in r["results"] if x["product"] == "linux"]
           assert linux and linux[0]["how"].startswith("package "), linux
+          PY
+      - name: Judge a lockfile with the ecosystem files just published
+        run: |
+          ./rasoat scan fixtures/npm --json > eco.json || test $? = 1
+          python3 - <<'PY'
+          import json
+          r = json.load(open("eco.json"))
+          checked = [n for n in r["notes"] if n.startswith("packages-checked:npm:")]
+          print(checked, r["summary"])
+          assert checked and int(checked[0].split(":")[2]) > 0, r["notes"]
+          assert not any(x["product"].startswith("pkg:npm/*") for x in r["results"]), "eco-npm was not to be had"
           PY

@@ -1,5 +1,35 @@
 {
   "changes": "Adapted to a table of the package, the advisory id, the fixed version and the severity. Advisory prose, references, reporter credits and unaffected package lists are removed.",
+  "advisories": [
+    {
+      "prefix": "GHSA-",
+      "source": "GitHub Advisory Database, through OSV.dev",
+      "sourceUrl": "https://github.com/github/advisory-database",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://github.com/github/advisory-database/blob/main/LICENSE.md"
+    },
+    {
+      "prefix": "MAL-",
+      "source": "OpenSSF Malicious Packages, through OSV.dev",
+      "sourceUrl": "https://github.com/ossf/malicious-packages",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://github.com/ossf/malicious-packages/blob/main/LICENSE"
+    },
+    {
+      "prefix": "RUSTSEC-",
+      "source": "RustSec Advisory Database, through OSV.dev",
+      "sourceUrl": "https://github.com/rustsec/advisory-db",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://github.com/rustsec/advisory-db/blob/main/LICENSE.txt"
+    },
+    {
+      "prefix": "GO-",
+      "source": "Go Vulnerability Database, through OSV.dev",
+      "sourceUrl": "https://github.com/golang/vulndb",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://github.com/golang/vulndb/blob/master/LICENSE"
+    }
+  ],
   "sources": [
     {
       "prefix": "ubuntu-",

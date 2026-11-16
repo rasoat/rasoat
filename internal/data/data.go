@@ -114,6 +114,19 @@ func WriteCache(file string, body []byte) {
 	}
 }
 
+// Age is how many days old a build date is, and whether that is stale. A date that cannot be read counts as stale.
+func Age(built string) (days int, stale bool) {
+	t, err := time.Parse("2006-01-02", built)
+	if err != nil {
+		return 0, true
+	}
+	days = max(0, int(time.Since(t)/dayMs))
+	return days, days > staleDays
+}
+
+// CachePath is where the snapshot download is kept.
+func CachePath() string { return filepath.Join(CacheDir(), "snapshot-v1.json") }
+
 func loaded(s *core.Snapshot, origin, problem string) *Loaded {
 	built, _ := time.Parse("2006-01-02", s.Built)
 	age := max(0, int(time.Since(built)/dayMs))
@@ -126,12 +139,17 @@ func loaded(s *core.Snapshot, origin, problem string) *Loaded {
 
 // Load chooses the snapshot. Never go back: a cache older than the binary's own copy, or one that lost records against
 // it, loses to the copy.
-func Load(offline bool, userAgent string) *Loaded {
+func Load(offline bool, userAgent string) *Loaded { return load(offline, false, userAgent) }
+
+// Refresh is Load that downloads now, whatever the cache's age: what `rasoat db update` asks for.
+func Refresh(userAgent string) *Loaded { return load(false, true, userAgent) }
+
+func load(offline, force bool, userAgent string) *Loaded {
 	var floor meta
 	if err := json.Unmarshal(bundledMeta, &floor); err != nil {
 		panic(err)
 	}
-	file := filepath.Join(CacheDir(), "snapshot-v1.json")
+	file := CachePath()
 	var best *core.Snapshot
 	origin := "bundled"
 	fresh := false
@@ -139,7 +157,7 @@ func Load(offline bool, userAgent string) *Loaded {
 		if s := core.ParseSnapshot(b); s != nil && s.Built >= floor.Built && core.KeepsCoverage(s.Counts(), floor.Counts) {
 			best, origin = s, "cached"
 			if st, err := os.Stat(file); err == nil {
-				fresh = time.Since(st.ModTime()) < dayMs
+				fresh = !force && time.Since(st.ModTime()) < dayMs
 			}
 		}
 	}

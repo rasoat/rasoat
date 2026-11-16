@@ -6,13 +6,18 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/rasoat/rasoat/internal/core"
 	"github.com/rasoat/rasoat/internal/data"
+	"github.com/rasoat/rasoat/internal/deps"
+	"github.com/rasoat/rasoat/internal/images"
+	"github.com/rasoat/rasoat/internal/inventory"
 	"github.com/rasoat/rasoat/internal/linux"
+	"github.com/rasoat/rasoat/internal/osvdb"
 	"github.com/rasoat/rasoat/internal/project"
 	"github.com/rasoat/rasoat/internal/site"
 )
@@ -79,18 +84,19 @@ type Tool_ struct {
 }
 
 type Report struct {
-	Schema     int       `json:"schema"`
-	Tool       Tool_     `json:"tool"`
-	Target     Target    `json:"target"`
-	Data       DataInfo  `json:"data"`
-	Site       *SiteInfo `json:"site"`
-	Host       *HostInfo `json:"host,omitempty"`
-	Results    []Result  `json:"results"`
-	Summary    Summary   `json:"summary"`
-	Notes      []string  `json:"notes"` // machine words: binary-bun-lock, truncated, or <runtime>-min:<version>
-	NotChecked []string  `json:"not_checked"`
-	Notices    []string  `json:"notices"`
-	ExitCode   int       `json:"exit_code"`
+	Schema     int              `json:"schema"`
+	Tool       Tool_            `json:"tool"`
+	Target     Target           `json:"target"`
+	Data       DataInfo         `json:"data"`
+	Site       *SiteInfo        `json:"site"`
+	Host       *HostInfo        `json:"host,omitempty"`
+	Results    []Result         `json:"results"`
+	Summary    Summary          `json:"summary"`
+	Notes      []string         `json:"notes"`      // machine words: binary-bun-lock, truncated, or <runtime>-min:<version>
+	NotJudged  []inventory.Item `json:"not_judged"` // images and pins no data judges, and references a variable hides
+	NotChecked []string         `json:"not_checked"`
+	Notices    []string         `json:"notices"`
+	ExitCode   int              `json:"exit_code"`
 }
 
 // NotChecked is said on every run: a clean result covers only these products, and "no findings" reads as "safe" otherwise.
@@ -159,33 +165,127 @@ func assemble(target Target, l *data.Loaded, results []Result, si *SiteInfo, not
 	s := tally(results)
 	return &Report{
 		Schema: 1, Tool: Tool_{Tool, Version}, Target: target, Data: DataOf(l), Site: si, Results: results, Summary: s,
-		Notes: notes, NotChecked: NotChecked, Notices: core.NOTICES, ExitCode: exitCode(s, len(results)),
+		Notes: notes, NotJudged: []inventory.Item{}, NotChecked: NotChecked, Notices: core.NOTICES, ExitCode: exitCode(s, len(results)),
 	}
 }
 
-// Dir is the report for a scanned directory.
-func Dir(root string, w project.Walked, l *data.Loaded) *Report {
+func purl(eco, name string) string { return deps.Purl(eco, name) }
+
+var advisoryURL = "https://osv.dev/vulnerability/"
+
+// safeID: an advisory id comes from downloaded data and reaches a URL and a terminal.
+var safeID = core.NewRe(`^[A-Za-z0-9._-]{1,64}$`)
+
+// depResults is one result per vulnerable package version, worst first, and what the summary needs of the clean rest.
+func depResults(d *osvdb.Outcome) (results []Result, ok int, notes []string) {
+	for _, v := range d.Vulns {
+		ver := v.Version
+		r := Result{Verdict: core.Verdict{Product: purl(v.Eco, v.Name), Version: &ver, Status: core.Vulnerable, NoFix: v.NoFix, Advisories: []core.VerdictAdvisory{}}, Sources: v.Files}
+		if v.Fix != "" {
+			fix := v.Fix
+			r.Fix = &fix
+		}
+		for _, h := range v.Hits {
+			if safeID.MatchString(h.ID) {
+				r.Advisories = append(r.Advisories, core.VerdictAdvisory{ID: h.ID, Severity: h.Severity, URL: advisoryURL + h.ID})
+			}
+		}
+		results = append(results, r)
+	}
+	sort.SliceStable(results, func(i, j int) bool { return worst(results[i]) < worst(results[j]) })
+	ecos := make([]string, 0, len(d.Checked)+len(d.NoData))
+	for e := range d.Checked {
+		ecos = append(ecos, e)
+	}
+	for e := range d.NoData {
+		ecos = append(ecos, e)
+	}
+	sort.Strings(ecos)
+	for _, e := range slices.Compact(ecos) {
+		if files := d.NoData[e]; len(files) > 0 { // never "clean": the data to judge with was not to be had
+			reason := "advisory-data-not-available"
+			results = append(results, Result{Verdict: core.Verdict{Product: purl(e, "*"), Status: core.Unknown, Reason: &reason, Advisories: []core.VerdictAdvisory{}}, Sources: files})
+			continue
+		}
+		vulnerable := 0
+		for _, v := range d.Vulns {
+			if v.Eco == e {
+				vulnerable++
+			}
+		}
+		ok += d.Checked[e] - vulnerable
+		notes = append(notes, fmt.Sprintf("packages-checked:%s:%d:%d", e, d.Checked[e], vulnerable))
+	}
+	return results, ok, notes
+}
+
+// maxUnjudged caps the notes that list images no family covers: a compose file can name dozens.
+const maxUnjudged = 10
+
+// Dir is the report for a scanned directory. lines are the release lines of the image families (nil: none to be had);
+// d is the judgement of its lockfile packages, nil when it has none.
+func Dir(root string, w project.Walked, l *data.Loaded, lines map[string][]images.Release, d *osvdb.Outcome) *Report {
 	var results []Result
 	index := map[string]int{}
 	today := Today()
-	for _, f := range w.Found {
-		key := f.Product + " " + f.Version
+	// put adds a source to the row for product+version, making the row first if it is new.
+	put := func(product, version, source string, judge func() (core.Verdict, string)) {
+		key := product + " " + version
 		i, ok := index[key]
 		if !ok {
-			v := f.Version
+			v, how := judge()
 			i = len(results)
 			index[key] = i
-			results = append(results, Result{Verdict: core.VerdictFor(f.Product, &v, l.Snapshot, today), Sources: []string{}})
+			results = append(results, Result{Verdict: v, Sources: []string{}, How: opt(how)})
 		}
-		seen := false
-		for _, s := range results[i].Sources {
-			seen = seen || s == f.Path
-		}
-		if !seen {
-			results[i].Sources = append(results[i].Sources, f.Path)
+		if !slices.Contains(results[i].Sources, source) {
+			results[i].Sources = append(results[i].Sources, source)
 		}
 	}
-	return assemble(Target{"dir", root}, l, results, nil, w.Notes)
+	for _, f := range w.Found {
+		source := f.Path
+		if f.Ref != "" {
+			source += " (" + f.Ref + ")"
+		}
+		put(f.Product, f.Version, source, func() (core.Verdict, string) {
+			v := f.Version
+			return core.VerdictFor(f.Product, &v, l.Snapshot, today), ""
+		})
+	}
+	notes := w.Notes
+	unjudged := map[string]bool{}
+	for _, im := range w.Images {
+		source := im.Path + " (" + im.Raw + ")"
+		if im.Family == nil {
+			if im.Acked { // the user's rule knows it, and no data judges it
+				continue
+			}
+			if !unjudged[source] && len(unjudged) < maxUnjudged {
+				notes = append(notes, "image-not-judged:"+source)
+			}
+			unjudged[source] = true
+			continue
+		}
+		put(im.Family.ID, im.Version, source, func() (core.Verdict, string) { return images.Judge(im.Ref, lines, today) })
+	}
+	if len(unjudged) > maxUnjudged {
+		notes = append(notes, fmt.Sprintf("image-not-judged-more:%d", len(unjudged)-maxUnjudged))
+	}
+	notJudged := inventory.NotJudged(w)
+	if d == nil {
+		rep := assemble(Target{"dir", root}, l, results, nil, notes)
+		rep.NotJudged = notJudged
+		return rep
+	}
+	pkgs, clean, pkgNotes := depResults(d)
+	rep := assemble(Target{"dir", root}, l, append(results, pkgs...), nil, append(slices.Clone(notes), pkgNotes...))
+	rep.NotJudged = notJudged
+	rep.Summary.OK += clean
+	rep.ExitCode = exitCode(rep.Summary, len(rep.Results)+clean)
+	if len(pkgNotes) > 0 { // what was judged leaves the "not checked" list: the ecosystems this tool reads
+		rep.NotChecked = slices.Replace(slices.Clone(NotChecked), 1, 2, "dependencies-in-other-ecosystems")
+	}
+	return rep
 }
 
 // Host is the report for a machine or a mounted root.
@@ -227,7 +327,7 @@ func Host(h *linux.Host, root string) *Report {
 		Schema: 1, Tool: Tool_{Tool, Version}, Target: Target{"host", root}, Data: info,
 		Host: &HostInfo{Distro: h.Distro.ID, Name: h.Distro.Name, Family: opt(h.Family), Packages: h.Packages, OpenNoFix: h.Open,
 			KernelRunning: opt(h.Running), KernelNewest: opt(h.Newest), RebootNeeded: h.Reboot, InContainer: h.InContainer, UpgradeCmd: opt(h.UpgradeCmd)},
-		Results: results, Summary: s, Notes: h.Notes, NotChecked: NotCheckedHost, Notices: append(append([]string{}, core.NOTICES...), linux.Notices...), ExitCode: exitCode(s, len(results)),
+		Results: results, Summary: s, Notes: h.Notes, NotJudged: []inventory.Item{}, NotChecked: NotCheckedHost, Notices: append(append([]string{}, core.NOTICES...), linux.Notices...), ExitCode: exitCode(s, len(results)),
 	}
 }
 

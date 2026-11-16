@@ -9,11 +9,15 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 
 	"github.com/rasoat/rasoat/internal/data"
+	"github.com/rasoat/rasoat/internal/images"
 	"github.com/rasoat/rasoat/internal/linux"
+	"github.com/rasoat/rasoat/internal/osvdb"
 	"github.com/rasoat/rasoat/internal/project"
 	"github.com/rasoat/rasoat/internal/report"
+	"github.com/rasoat/rasoat/internal/rules"
 	"github.com/rasoat/rasoat/internal/site"
 )
 
@@ -24,6 +28,22 @@ var UserAgent = fmt.Sprintf("%s-cli/%s (+https://rasoat.com/en/check)", report.T
 type NotATarget struct{ Target string }
 
 func (e *NotATarget) Error() string { return "Not a directory or a site address: " + e.Target }
+
+// NotADir is a usage error: discover reads a directory, never an address.
+type NotADir struct{ Target string }
+
+func (e *NotADir) Error() string { return "Not a directory: " + e.Target }
+
+// Discover walks a directory and lists what it names. It judges nothing and uses no network and no data file.
+// rs is the user's own rules, or nil.
+func Discover(target string, withPackages bool, rs *rules.Set) (*report.Inventory, error) {
+	st, err := os.Stat(target)
+	if err != nil || !st.IsDir() {
+		return nil, &NotADir{target}
+	}
+	dir, _ := filepath.Abs(target)
+	return report.InventoryOf(dir, project.WalkWith(dir, rs), withPackages), nil
+}
 
 var (
 	hasScheme = core.NewRe(`(?i)^https?://`)
@@ -39,7 +59,8 @@ func Host(root, kernel string, offline bool) (*report.Report, error) {
 	if root == "" {
 		root, shown = "/", "this machine"
 	}
-	h, err := linux.Scan(linux.Options{Root: root, Kernel: kernel, Offline: offline, UserAgent: UserAgent})
+	snapshot := func() *core.Snapshot { return data.Load(offline, UserAgent).Snapshot }
+	h, err := linux.Scan(linux.Options{Root: root, Kernel: kernel, Offline: offline, UserAgent: UserAgent, Snapshot: snapshot})
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +69,8 @@ func Host(root, kernel string, offline bool) (*report.Report, error) {
 
 // Target scans a directory if one has that name, a URL if it says so or looks like a host. public: an agent chose the
 // address, perhaps from text it read, so never reach into the user's machine or network; returns *site.Refused then.
-func Target(target string, offline, public bool) (*report.Report, *data.Loaded, error) {
+// rs is the user's own rules for a directory, or nil.
+func Target(target string, offline, public bool, rs *rules.Set) (*report.Report, *data.Loaded, error) {
 	dir, url := "", ""
 	if hasScheme.MatchString(target) {
 		url = target
@@ -61,7 +83,25 @@ func Target(target string, offline, public bool) (*report.Report, *data.Loaded, 
 	}
 	l := data.Load(offline, UserAgent)
 	if dir != "" {
-		return report.Dir(dir, project.Walk(dir), l), l, nil
+		w := project.WalkWith(dir, rs)
+		// The release lines of the image families are in the linux index, one small file that names no project: fetched only
+		// when this directory names an image or a CI pin whose family is judged from them.
+		var lines map[string][]images.Release
+		if slices.ContainsFunc(w.Images, func(i project.Image) bool { return i.Family != nil }) {
+			if idx, _ := linux.LoadIndex(offline, UserAgent); idx != nil {
+				lines = map[string][]images.Release{}
+				for id, ls := range idx.Lines {
+					for _, l := range ls {
+						lines[id] = append(lines[id], images.Release(l))
+					}
+				}
+			}
+		}
+		var d *osvdb.Outcome
+		if len(w.Pkgs) > 0 {
+			d = osvdb.Scan(w.Pkgs, offline, UserAgent)
+		}
+		return report.Dir(dir, w, l, lines, d), l, nil
 	}
 	o, err := site.Inspect(url, site.NewGet(UserAgent, public), l.Snapshot.Requirements)
 	if err != nil {

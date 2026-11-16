@@ -1,0 +1,11 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: apt.postgresql.org
+Label: PostgreSQL for Debian/Ubuntu repository
+Suite: noble-pgdg
+Codename: noble-pgdg
+Date: Sat, 14 Nov 2026 14:29:53 UTC
+Architectures: amd64 arm64 ppc64el
+Components: main 8.2 8.3 8.4 9.0 9.1 9.2 9.3 9.4 9.5 9.6 10 11 12 13 14 15 16 17 18 19 20
+Changelogs: https://apt.postgresql.org/pub/repos/apt/pool/@CHANGEPATH@.changelog

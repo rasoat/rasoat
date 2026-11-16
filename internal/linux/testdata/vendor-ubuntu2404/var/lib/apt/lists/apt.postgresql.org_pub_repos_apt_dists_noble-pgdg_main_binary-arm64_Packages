@@ -1,0 +1,18 @@
+Package: libpq5
+Source: postgresql-18
+Version: 18.7-1.pgdg24.04+2
+Architecture: arm64
+Filename: pool/main/p/postgresql-18/libpq5_18.7-1.pgdg24.04+2_arm64.deb
+
+Package: postgresql-client-16
+Source: postgresql-16
+Version: 16.16-1.pgdg24.04+1
+Architecture: arm64
+Filename: pool/main/p/postgresql-16/postgresql-client-16_16.16-1.pgdg24.04+1_arm64.deb
+
+Package: postgresql-client-common
+Source: postgresql-common
+Version: 295.pgdg24.04+1
+Architecture: all
+Filename: pool/main/p/postgresql-common/postgresql-client-common_295.pgdg24.04+1_all.deb
+

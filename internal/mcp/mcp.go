@@ -14,7 +14,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/rasoat/rasoat/internal/localdb"
 	"github.com/rasoat/rasoat/internal/report"
+	"github.com/rasoat/rasoat/internal/rules"
 	"github.com/rasoat/rasoat/internal/scan"
 	"github.com/rasoat/rasoat/internal/site"
 )
@@ -48,14 +50,26 @@ var hostInput = obj{
 	},
 	"additionalProperties": false,
 }
+var discoverInput = obj{
+	"type": "object",
+	"properties": obj{
+		"target": obj{"type": "string", "description": "An absolute directory path."},
+	},
+	"required":             []string{"target"},
+	"additionalProperties": false,
+}
+var noInput = obj{"type": "object", "properties": obj{}, "additionalProperties": false}
 var annotations = obj{"readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": true}
+
+// localAnnotations: these tools send nothing.
+var localAnnotations = obj{"readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}
 
 // Tools is what tools/list answers.
 var Tools = []obj{
 	{
 		"name":        "scan",
 		"title":       "Scan versions for published vulnerabilities",
-		"description": "Check the Next.js, WordPress core, Node.js, PHP and Bun versions of a directory (from lockfiles and version files, read as text) or a public site (from what a browser downloads) against published advisories. Returns each version's status, the version to move to, and the advisories. A clean result covers only the versions it lists: read not_checked. Reads only; writes nothing but its own data cache.",
+		"description": "Check a directory (read as text: every npm, crates.io and Go package in its lockfiles, the container images and CI runtime pins it names, and Next.js, WordPress core, Node.js, PHP and Bun pins) or a public site (from what a browser downloads) against published advisories. Returns each version's status, the version to move to, and the advisories. A clean result covers only the versions it lists: read not_checked. Reads only; writes nothing but its own data cache.",
 		"inputSchema": input, "annotations": annotations,
 	},
 	{
@@ -69,6 +83,18 @@ var Tools = []obj{
 		"title":       "Check this Linux machine",
 		"description": "Check the Linux machine this server runs on, from its own files: whether its distro release is still supported, which installed packages lack a fix their distro has published, its kernel, and whether a reboot is needed. Returns upgrade_command, which it does not run: show it to the user and get consent. Advisories with no fix yet are a count. Reads only; runs no command; sends only which distro release asks. Read not_checked.",
 		"inputSchema": hostInput, "annotations": annotations,
+	},
+	{
+		"name":        "discover",
+		"title":       "List what a directory runs",
+		"description": "List every component a directory names, read as text: version pins, container images, CI runtime pins, and a count of lockfile packages per ecosystem. Each item says which data judges it (judged_by), or null when none does: those are what scan cannot cover. It judges nothing, sends nothing and writes nothing. Run scan for verdicts.",
+		"inputSchema": discoverInput, "annotations": localAnnotations,
+	},
+	{
+		"name":        "db_status",
+		"title":       "Show the local vulnerability data",
+		"description": "Show the data files this machine holds for scans: the snapshot, the release-line index, each ecosystem file and each cached distro release file, with built date, records, age in days and whether it is stale. It reads the cache only, sends nothing and downloads nothing: there is no tool to update the data, so tell the user to run `rasoat db update` if it is stale or missing.",
+		"inputSchema": noInput, "annotations": localAnnotations,
 	},
 }
 
@@ -134,9 +160,43 @@ func result(v any) obj {
 	return obj{"content": []obj{{"type": "text", "text": dataNotice}, {"type": "text", "text": string(text)}}, "structuredContent": clipped, "isError": false}
 }
 
+func callDiscover(args obj) obj {
+	target, _ := args["target"].(string)
+	if target == "" {
+		return failure("target is required: an absolute directory path.")
+	}
+	for k := range args {
+		if k != "target" {
+			return failure("Unknown argument: " + clipStr(k))
+		}
+	}
+	// Packages are counted, not listed: a monorepo has thousands, and an agent's context is not for them. scan judges them.
+	rs, err := rules.Load("") // the user's own file: a scanned directory cannot supply rules
+	if err != nil {
+		return failure(clipStr(err.Error()))
+	}
+	inv, err := scan.Discover(target, false, rs)
+	if err != nil {
+		return failure(clipStr(err.Error()))
+	}
+	return result(inv)
+}
+
+func callDBStatus(args obj) obj {
+	if len(args) > 0 {
+		return failure("db_status takes no arguments.")
+	}
+	return result(localdb.Inspect())
+}
+
 func call(name string, args obj) obj {
-	if name == "host" {
+	switch name {
+	case "host":
 		return callHost(args)
+	case "discover":
+		return callDiscover(args)
+	case "db_status":
+		return callDBStatus(args)
 	}
 	target, _ := args["target"].(string)
 	if target == "" {
@@ -155,7 +215,11 @@ func call(name string, args obj) obj {
 			return failure("Unknown argument: " + clipStr(k))
 		}
 	}
-	rep, l, err := scan.Target(target, offline, true)
+	rs, err := rules.Load("")
+	if err != nil {
+		return failure(clipStr(err.Error()))
+	}
+	rep, l, err := scan.Target(target, offline, true, rs)
 	if err != nil {
 		var nt *scan.NotATarget
 		var refused *site.Refused

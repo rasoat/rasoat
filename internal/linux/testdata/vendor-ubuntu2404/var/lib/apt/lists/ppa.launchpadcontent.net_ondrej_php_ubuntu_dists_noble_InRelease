@@ -1,0 +1,12 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: LP-PPA-ondrej-php
+Label: PPA for PHP
+Suite: noble
+Version: 24.04
+Codename: noble
+Date: Thu, 12 Nov 2026 19:01:31 UTC
+Architectures: amd64 arm64 armhf i386 ppc64el riscv64 s390x
+Components: main
+Description: Ubuntu Noble 24.04

@@ -1,0 +1,21 @@
+{
+  "description": "rasoat: a one-line summary when a session starts in a project, and a line when a package change adds or fixes a vulnerable version. Every hook runs the binary and exits 0; none blocks.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          { "type": "command", "command": "rasoat hook session-start", "timeout": 25 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash",
+        "hooks": [
+          { "type": "command", "command": "rasoat hook post-tool-use", "timeout": 20 }
+        ]
+      }
+    ]
+  }
+}

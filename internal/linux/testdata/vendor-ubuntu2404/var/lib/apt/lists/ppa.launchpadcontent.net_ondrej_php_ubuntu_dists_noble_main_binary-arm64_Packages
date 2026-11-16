@@ -1,0 +1,30 @@
+Package: php-common
+Source: php-defaults (101~+ubuntu24.04.1+deb.sury.org+1)
+Architecture: all
+Version: 2:101~+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/p/php-defaults/php-common_101~+ubuntu24.04.1+deb.sury.org+1_all.deb
+
+Package: php8.3-cli
+Source: php8.3
+Architecture: arm64
+Version: 8.3.36-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/p/php8.3/php8.3-cli_8.3.36-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+
+Package: php8.3-common
+Source: php8.3
+Architecture: arm64
+Version: 8.3.36-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/p/php8.3/php8.3-common_8.3.36-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+
+Package: php8.3-opcache
+Source: php8.3
+Architecture: arm64
+Version: 8.3.36-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/p/php8.3/php8.3-opcache_8.3.36-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+
+Package: php8.3-readline
+Source: php8.3
+Architecture: arm64
+Version: 8.3.36-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/p/php8.3/php8.3-readline_8.3.36-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+

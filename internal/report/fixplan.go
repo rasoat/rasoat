@@ -155,6 +155,12 @@ func change(product, file, to string, isSite bool) Change {
 	return Change{file, &cwd, nil, fmt.Sprintf("Set %s to %s in %s, and install that version wherever the project runs.", product, to, name)}
 }
 
+// sourceFile is the file of a source: an image or CI pin source reads `Dockerfile (node:22)`.
+func sourceFile(source string) string {
+	file, _, _ := strings.Cut(source, " (")
+	return file
+}
+
 func requirement(r Result, to string, results []Result, l *data.Loaded) *Requirement {
 	req := l.Snapshot.Requirements
 	runtime, needs, rng := "", "", ""
@@ -201,6 +207,8 @@ func whyNoMove(r Result) string {
 	switch deref(r.Reason) {
 	case "version-not-exact":
 		return "The version is a range or a partial number. Commit a lockfile or an exact version, then scan again."
+	case "image-tag-unpinned":
+		return "The tag does not name a version. Pin one in the file, then scan again."
 	case "version-hidden":
 		return "The site does not show its version. Scan the project directory instead."
 	}
@@ -216,8 +224,19 @@ func step(r Result, rep *Report, l *data.Loaded) Step {
 		to := *r.Fix
 		s.CrossesMajor = r.Version != nil && line(r.Product, to) != line(r.Product, *r.Version)
 		s.Requires = requirement(r, to, rep.Results, l)
+		root := ""
+		if rep.Target.Kind == "dir" {
+			root = rep.Target.Value
+		}
 		for _, f := range r.Sources {
-			s.Changes = append(s.Changes, change(r.Product, f, to, isSite))
+			switch ref := sourceRef(f); {
+			case strings.HasPrefix(r.Product, "pkg:") && !isSite:
+				s.Changes = append(s.Changes, pkgChange(r.Product, r.Version, sourceFile(f), to, root))
+			case ref != "" && !isSite:
+				s.Changes = append(s.Changes, imageChange(sourceFile(f), ref, to))
+			default:
+				s.Changes = append(s.Changes, change(r.Product, sourceFile(f), to, isSite))
+			}
 		}
 		s.Guides = guides(r.Product, r.Version, to)
 	default:
@@ -226,7 +245,7 @@ func step(r Result, rep *Report, l *data.Loaded) Step {
 			s.Action = "cannot-judge"
 		}
 		for _, f := range r.Sources {
-			s.Changes = append(s.Changes, Change{File: f, How: whyNoMove(r)})
+			s.Changes = append(s.Changes, Change{File: sourceFile(f), How: whyNoMove(r)})
 		}
 	}
 	s.Advisories = AdvisoryCount{Total: len(r.Advisories), Worst: []WorstAdvisory{}}

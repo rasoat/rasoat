@@ -21,20 +21,23 @@ type Package struct {
 	Source        string // source package
 	SourceVersion string
 	Stream        string // rpm module stream, from the modularity label: "8.1", "18"; empty when not modular
+	Vendor        string // who built it, when not the distro: an apt Origin, an rpm Vendor, or a marker's name; see origin.go
+	Decided       string // how: "apt-lists", "rpm-vendor", "version-marker"; empty when nothing decided and the distro is assumed
 }
 
 const maxDB = 512 << 20
 
+func openFile(root, rel string) (*os.File, error) {
+	if root == "/" {
+		return os.Open(filepath.Join(root, rel))
+	}
+	return os.OpenInRoot(root, rel)
+}
+
 // readFile reads a file under root, within the size limit. Under a mounted image every path, symlinks included, stays inside
 // the image: a hostile image cannot make this read the machine it is examined on. On this machine's own "/" nothing can escape.
 func readFile(root, rel string) ([]byte, error) {
-	var f *os.File
-	var err error
-	if root == "/" {
-		f, err = os.Open(filepath.Join(root, rel))
-	} else {
-		f, err = os.OpenInRoot(root, rel)
-	}
+	f, err := openFile(root, rel)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +239,7 @@ func parseHeader(b []byte) (Package, bool) {
 	}
 	data := b[8+16*il:]
 	data = data[:dl]
-	var name, version, release, sourcerpm, stream string
+	var name, version, release, sourcerpm, stream, vendor string
 	epoch := -1
 	str := func(off uint32) string {
 		if off >= uint32(len(data)) {
@@ -261,6 +264,8 @@ func parseHeader(b []byte) (Package, bool) {
 			if uint64(off)+4 <= uint64(len(data)) {
 				epoch = int(binary.BigEndian.Uint32(data[off:]))
 			}
+		case 1011:
+			vendor = str(off)
 		case 1044:
 			sourcerpm = str(off)
 		case 5096:
@@ -277,6 +282,9 @@ func parseHeader(b []byte) (Package, bool) {
 		evr = strconv.Itoa(epoch) + ":" + evr
 	}
 	p := Package{Name: name, Version: evr, Source: name, SourceVersion: evr, Stream: stream}
+	if v, ok := rpmVendor(vendor); ok {
+		p.Vendor, p.Decided = v, "rpm-vendor"
+	}
 	// openssl-3.0.7-27.el9.src.rpm gives source openssl, 3.0.7-27.el9, with the binary's epoch.
 	if s := strings.TrimSuffix(strings.TrimSuffix(sourcerpm, ".rpm"), ".src"); s != "" {
 		rest, srcRelease := cutLast(s, '-')

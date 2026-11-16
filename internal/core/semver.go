@@ -351,3 +351,9 @@ func (r *Re) FindAllStringSubmatch(s string, n int) [][]string {
 func (r *Re) ReplaceAllStringFunc(s string, f func(string) string) string {
 	return r.get().ReplaceAllStringFunc(s, f)
 }
+
+// ValidVersion says whether s reads as a semantic version, with or without a leading v.
+func ValidVersion(s string) bool {
+	_, ok := parseSemver(s)
+	return ok
+}
