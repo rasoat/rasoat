@@ -86,7 +86,7 @@ func TestOnlyWhatTheWalkReadsIsAManifestAndItsRootIsTheProject(t *testing.T) {
 		if !project.IsManifest(p) {
 			t.Errorf("%s should be a manifest", p)
 		}
-		if got := project.RootOf(p); got != root {
+		if got := filepath.ToSlash(project.RootOf(p)); got != root { // native separators on Windows
 			t.Errorf("%s: root %s, want %s", p, got, root)
 		}
 	}
