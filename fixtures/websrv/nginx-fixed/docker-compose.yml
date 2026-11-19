@@ -1,0 +1,5 @@
+services:
+  web:
+    image: nginx:1.31.9
+  edge:
+    image: nginx:1.30.7-alpine

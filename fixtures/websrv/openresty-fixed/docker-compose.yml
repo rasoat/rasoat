@@ -1,0 +1,5 @@
+# No real OpenResty release has a clean nginx core in nginx.org's list yet (every one is on a branch with open advisories),
+# so this tag is made up: nginx 1.31.9 is the fixed mainline release. It proves the ok path, nothing more.
+services:
+  s1:
+    image: openresty/openresty:1.31.9.1-alpine

@@ -88,6 +88,7 @@ func classify(f *Family, tag string) (Kind, string) {
 		}
 		return Unpinned, ""
 	}
+	tag = withoutPrefixes(f, tag)
 	if f.Codenames != nil {
 		name, _, _ := strings.Cut(tag, "-")
 		if cycle := f.Codenames[name]; cycle != "" {
@@ -102,6 +103,19 @@ func classify(f *Family, tag string) (Kind, string) {
 		return Line, m[1]
 	}
 	return Exact, m[1]
+}
+
+// withoutPrefixes reads past the flavour words a family's tags put before the version: `contrib-distroless-v1.36.2`.
+func withoutPrefixes(f *Family, tag string) string {
+	for cut := len(f.Prefixes) > 0; cut; {
+		cut = false
+		for _, p := range f.Prefixes {
+			if rest, ok := strings.CutPrefix(tag, p+"-"); ok {
+				tag, cut = rest, true
+			}
+		}
+	}
+	return tag
 }
 
 // Reclassify reads the tag of an image the table did not know as a member of family f: the user's rule says so.

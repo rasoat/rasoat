@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/rasoat/rasoat/internal/deps"
+	"github.com/rasoat/rasoat/internal/images"
 	"github.com/rasoat/rasoat/internal/osvdb"
 	"github.com/rasoat/rasoat/internal/project"
 )
@@ -20,8 +21,10 @@ const (
 
 // What judges a component. A component nothing judges has none (JudgedBy nil).
 const (
-	Snapshot = "snapshot" // the rasoat.com snapshot: Next.js, WordPress, Node.js, PHP, Bun
-	Lines    = "lines"    // release lines in the linux index: the image and CI-pin families
+	Snapshot   = "snapshot"   // the rasoat.com snapshot: Next.js, WordPress, Node.js, PHP, Bun
+	Lines      = "lines"      // release lines in the linux index: the image and CI-pin families
+	Advisories = "advisories" // an exact tag is judged against the vendor's advisories (nginx, Apache httpd, Caddy, Traefik, Envoy, HAProxy...); a floating tag by release lines
+	None       = "none"       // a recognised product no data judges: its name is known, nothing about its versions is (OpenLiteSpeed, LiteSpeed, lighttpd, Tengine)
 )
 
 // Item is one component. Version is nil when the file does not name one. Ref is the image or CI pin as the file writes
@@ -55,6 +58,22 @@ func byRule(rule, judge string) *string {
 	return ptr("rule:" + rule + " → " + judge)
 }
 
+// judge is what judges a component of a family: its advisories when it has them, else its release lines, else nothing.
+func judge(f *images.Family) string {
+	switch {
+	case f.Advisories:
+		return Advisories
+	case f.NoEOL:
+		return None
+	}
+	return Lines
+}
+
+// Judged: some data judges the component. A recognised product with no data (None) is listed, and is not judged.
+func (it Item) Judged() bool {
+	return it.JudgedBy != nil && *it.JudgedBy != None && !strings.HasSuffix(*it.JudgedBy, "→ "+None)
+}
+
 func imageItem(im project.Image) Item {
 	r := im.Ref
 	it := Item{Kind: Image, Product: r.Image, Version: ptr(r.Version), Where: im.Path, Ref: r.Raw, Unresolved: r.Unresolved, Rule: r.Rule, Acknowledged: r.Acked}
@@ -79,7 +98,7 @@ func imageItem(im project.Image) Item {
 		it.JudgedBy = byRule(r.Rule, Snapshot)
 		it.Product = r.Family.ID
 	default:
-		it.JudgedBy = byRule(r.Rule, Lines)
+		it.JudgedBy = byRule(r.Rule, judge(r.Family))
 		it.Product = r.Family.ID
 	}
 	return it
@@ -142,7 +161,7 @@ func order(kind string) int {
 func NotJudged(w project.Walked) []Item {
 	out := []Item{}
 	for _, it := range Of(w) {
-		if it.Kind != Package && it.JudgedBy == nil && !it.Acknowledged {
+		if it.Kind != Package && !it.Judged() && !it.Acknowledged {
 			out = append(out, it)
 		}
 	}

@@ -171,11 +171,6 @@ func assemble(target Target, l *data.Loaded, results []Result, si *SiteInfo, not
 
 func purl(eco, name string) string { return deps.Purl(eco, name) }
 
-var advisoryURL = "https://osv.dev/vulnerability/"
-
-// safeID: an advisory id comes from downloaded data and reaches a URL and a terminal.
-var safeID = core.NewRe(`^[A-Za-z0-9._-]{1,64}$`)
-
 // depResults is one result per vulnerable package version, worst first, and what the summary needs of the clean rest.
 func depResults(d *osvdb.Outcome) (results []Result, ok int, notes []string) {
 	for _, v := range d.Vulns {
@@ -186,8 +181,8 @@ func depResults(d *osvdb.Outcome) (results []Result, ok int, notes []string) {
 			r.Fix = &fix
 		}
 		for _, h := range v.Hits {
-			if safeID.MatchString(h.ID) {
-				r.Advisories = append(r.Advisories, core.VerdictAdvisory{ID: h.ID, Severity: h.Severity, URL: advisoryURL + h.ID})
+			if url, ok := osvdb.AdvisoryURL(h.ID); ok {
+				r.Advisories = append(r.Advisories, core.VerdictAdvisory{ID: h.ID, Severity: h.Severity, URL: url})
 			}
 		}
 		results = append(results, r)
@@ -223,8 +218,9 @@ func depResults(d *osvdb.Outcome) (results []Result, ok int, notes []string) {
 const maxUnjudged = 10
 
 // Dir is the report for a scanned directory. lines are the release lines of the image families (nil: none to be had);
-// d is the judgement of its lockfile packages, nil when it has none.
-func Dir(root string, w project.Walked, l *data.Loaded, lines map[string][]images.Release, d *osvdb.Outcome) *Report {
+// d is the judgement of its lockfile packages, nil when it has none. exact judges an exact image tag of a family that has
+// advisory data of its own (nginx, Caddy, Traefik), or is nil.
+func Dir(root string, w project.Walked, l *data.Loaded, lines map[string][]images.Release, d *osvdb.Outcome, exact images.ExactJudge) *Report {
 	var results []Result
 	index := map[string]int{}
 	today := Today()
@@ -266,7 +262,7 @@ func Dir(root string, w project.Walked, l *data.Loaded, lines map[string][]image
 			unjudged[source] = true
 			continue
 		}
-		put(im.Family.ID, im.Version, source, func() (core.Verdict, string) { return images.Judge(im.Ref, lines, today) })
+		put(im.Family.ID, im.Version, source, func() (core.Verdict, string) { return images.JudgeWith(im.Ref, lines, today, exact) })
 	}
 	if len(unjudged) > maxUnjudged {
 		notes = append(notes, fmt.Sprintf("image-not-judged-more:%d", len(unjudged)-maxUnjudged))

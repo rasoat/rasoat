@@ -2,7 +2,7 @@ package data
 
 import (
 	"encoding/json"
-	"slices"
+	"maps"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ func TestMetaEqualsTheSnapshotItDescribes(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := Bundled()
-	if m.Built != s.Built || !slices.Equal(m.Counts, s.Counts()) {
+	if m.Built != s.Built || !maps.Equal(m.Counts, s.Counts()) {
 		t.Errorf("meta %v, snapshot %s %v", m, s.Built, s.Counts())
 	}
 }

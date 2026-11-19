@@ -1,0 +1,5 @@
+services:
+  s1:
+    image: haproxy:3.2.27
+  s2:
+    image: haproxy:3.4.8-alpine

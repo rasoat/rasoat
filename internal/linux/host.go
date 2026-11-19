@@ -2,6 +2,7 @@ package linux
 
 import (
 	"errors"
+	"github.com/rasoat/rasoat/internal/images"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,6 +22,7 @@ type Options struct {
 	UserAgent string
 	Today     string
 	Snapshot  func() *core.Snapshot // the product verdicts; asked for only when a vendor PHP or Node package needs them
+	Exact     images.ExactJudge     // exact versions of vendor nginx and Caddy packages, from their advisory data; nil: the release line judges
 }
 
 // Finding is the result for one thing on the host: the release, the kernel, or a source package.

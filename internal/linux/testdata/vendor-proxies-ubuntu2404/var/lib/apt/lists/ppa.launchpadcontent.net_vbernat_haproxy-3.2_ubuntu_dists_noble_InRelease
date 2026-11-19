@@ -1,0 +1,12 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: LP-PPA-vbernat-haproxy-3.2
+Label: HAProxy 3.2
+Suite: noble
+Version: 24.04
+Codename: noble
+Date: Thu, 19 Nov 2026  1:31:35 UTC
+Architectures: amd64 arm64 armhf i386 ppc64el riscv64 s390x
+Components: main
+Description: Ubuntu Noble 24.04

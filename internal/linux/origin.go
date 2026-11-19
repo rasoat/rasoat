@@ -47,6 +47,7 @@ var markers = []struct {
 	{regexp.MustCompile(`\+maria~`), "mariadb"},
 	{regexp.MustCompile(`\+pmx`), "proxmox"},
 	{regexp.MustCompile(`[.+~]remi`), "remi"},
+	{regexp.MustCompile(`^\d+\.\d+\.\d+-\d+~[a-z]+$`), "nginx"}, // nginx.org: 1.31.8-1~noble. The product also needs source nginx.
 }
 
 func markerVendor(version string) string {
@@ -230,6 +231,9 @@ func assignOrigins(root, family string, pkgs []Package) {
 			continue
 		}
 		if v := markerVendor(pkgs[i].Version); v != "" {
+			if v == "nginx" && pkgs[i].Name != "nginx" && !strings.HasPrefix(pkgs[i].Name, "nginx-") {
+				continue // the pattern is too common to claim any other package
+			}
 			pkgs[i].Vendor, pkgs[i].Decided = v, "version-marker"
 		}
 	}

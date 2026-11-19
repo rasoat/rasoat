@@ -1,0 +1,354 @@
+Package: adduser
+Architecture: all
+Version: 3.137ubuntu1
+Filename: pool/main/a/adduser/adduser_3.137ubuntu1_all.deb
+
+Package: base-passwd
+Architecture: arm64
+Version: 3.6.3build1
+Filename: pool/main/b/base-passwd/base-passwd_3.6.3build1_arm64.deb
+
+Package: bash
+Architecture: arm64
+Version: 5.2.21-2ubuntu4
+Filename: pool/main/b/bash/bash_5.2.21-2ubuntu4_arm64.deb
+
+Package: dash
+Architecture: arm64
+Version: 0.5.12-6ubuntu5
+Filename: pool/main/d/dash/dash_0.5.12-6ubuntu5_arm64.deb
+
+Package: debconf
+Architecture: all
+Version: 1.5.86ubuntu1
+Filename: pool/main/d/debconf/debconf_1.5.86ubuntu1_all.deb
+
+Package: debianutils
+Architecture: arm64
+Version: 5.17build1
+Filename: pool/main/d/debianutils/debianutils_5.17build1_arm64.deb
+
+Package: findutils
+Architecture: arm64
+Version: 4.9.0-5build1
+Filename: pool/main/f/findutils/findutils_4.9.0-5build1_arm64.deb
+
+Package: gir1.2-girepository-2.0
+Architecture: arm64
+Version: 1.80.1-1
+Source: gobject-introspection
+Filename: pool/main/g/gobject-introspection/gir1.2-girepository-2.0_1.80.1-1_arm64.deb
+
+Package: grep
+Architecture: arm64
+Version: 3.11-4build1
+Filename: pool/main/g/grep/grep_3.11-4build1_arm64.deb
+
+Package: hostname
+Architecture: arm64
+Version: 3.23+nmu2ubuntu2
+Filename: pool/main/h/hostname/hostname_3.23+nmu2ubuntu2_arm64.deb
+
+Package: init-system-helpers
+Architecture: all
+Version: 1.66ubuntu1
+Filename: pool/main/i/init-system-helpers/init-system-helpers_1.66ubuntu1_all.deb
+
+Package: iso-codes
+Architecture: all
+Version: 4.16.0-1
+Filename: pool/main/i/iso-codes/iso-codes_4.16.0-1_all.deb
+
+Package: libappstream5
+Architecture: arm64
+Version: 1.0.2-1build6
+Source: appstream
+Filename: pool/main/a/appstream/libappstream5_1.0.2-1build6_arm64.deb
+
+Package: libargon2-1
+Architecture: arm64
+Version: 0~20190702+dfsg-4build1
+Source: argon2
+Filename: pool/main/a/argon2/libargon2-1_0~20190702+dfsg-4build1_arm64.deb
+
+Package: libassuan0
+Architecture: arm64
+Version: 2.5.6-1build1
+Source: libassuan
+Filename: pool/main/liba/libassuan/libassuan0_2.5.6-1build1_arm64.deb
+
+Package: libcap-ng0
+Architecture: arm64
+Version: 0.8.4-2build2
+Source: libcap-ng
+Filename: pool/main/libc/libcap-ng/libcap-ng0_0.8.4-2build2_arm64.deb
+
+Package: libcrypt1
+Architecture: arm64
+Version: 1:4.4.36-4build1
+Source: libxcrypt
+Filename: pool/main/libx/libxcrypt/libcrypt1_4.4.36-4build1_arm64.deb
+
+Package: libdb5.3t64
+Architecture: arm64
+Version: 5.3.28+dfsg2-7
+Source: db5.3
+Filename: pool/main/d/db5.3/libdb5.3t64_5.3.28+dfsg2-7_arm64.deb
+
+Package: libdebconfclient0
+Architecture: arm64
+Version: 0.271ubuntu3
+Source: cdebconf
+Filename: pool/main/c/cdebconf/libdebconfclient0_0.271ubuntu3_arm64.deb
+
+Package: libduktape207
+Architecture: arm64
+Version: 2.7.0+tests-0ubuntu3
+Source: duktape
+Filename: pool/main/d/duktape/libduktape207_2.7.0+tests-0ubuntu3_arm64.deb
+
+Package: libffi8
+Architecture: arm64
+Version: 3.4.6-1build1
+Source: libffi
+Filename: pool/main/libf/libffi/libffi8_3.4.6-1build1_arm64.deb
+
+Package: libgdbm-compat4t64
+Architecture: arm64
+Version: 1.23-5.1build1
+Source: gdbm
+Filename: pool/main/g/gdbm/libgdbm-compat4t64_1.23-5.1build1_arm64.deb
+
+Package: libgdbm6t64
+Architecture: arm64
+Version: 1.23-5.1build1
+Source: gdbm
+Filename: pool/main/g/gdbm/libgdbm6t64_1.23-5.1build1_arm64.deb
+
+Package: libgirepository-1.0-1
+Architecture: arm64
+Version: 1.80.1-1
+Source: gobject-introspection
+Filename: pool/main/g/gobject-introspection/libgirepository-1.0-1_1.80.1-1_arm64.deb
+
+Package: libjansson4
+Architecture: arm64
+Version: 2.14-2build2
+Source: jansson
+Filename: pool/main/j/jansson/libjansson4_2.14-2build2_arm64.deb
+
+Package: libjson-c5
+Architecture: arm64
+Version: 0.17-1build1
+Source: json-c
+Filename: pool/main/j/json-c/libjson-c5_0.17-1build1_arm64.deb
+
+Package: libkeyutils1
+Architecture: arm64
+Version: 1.6.3-3build1
+Source: keyutils
+Filename: pool/main/k/keyutils/libkeyutils1_1.6.3-3build1_arm64.deb
+
+Package: libksba8
+Architecture: arm64
+Version: 1.6.6-1build1
+Source: libksba
+Filename: pool/main/libk/libksba/libksba8_1.6.6-1build1_arm64.deb
+
+Package: liblua5.4-0
+Architecture: arm64
+Version: 5.4.6-3build2
+Source: lua5.4
+Filename: pool/main/l/lua5.4/liblua5.4-0_5.4.6-3build2_arm64.deb
+
+Package: libnpth0t64
+Architecture: arm64
+Version: 1.6-3.1build1
+Source: npth
+Filename: pool/main/n/npth/libnpth0t64_1.6-3.1build1_arm64.deb
+
+Package: libpsl5t64
+Architecture: arm64
+Version: 0.21.2-1.1build1
+Source: libpsl
+Filename: pool/main/libp/libpsl/libpsl5t64_0.21.2-1.1build1_arm64.deb
+
+Package: libreadline8t64
+Architecture: arm64
+Version: 8.2-4build1
+Source: readline
+Filename: pool/main/r/readline/libreadline8t64_8.2-4build1_arm64.deb
+
+Package: librtmp1
+Architecture: arm64
+Version: 2.4+20151223.gitfa8646d.1-2build7
+Source: rtmpdump
+Filename: pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2build7_arm64.deb
+
+Package: libsemanage-common
+Architecture: all
+Version: 3.5-1build5
+Source: libsemanage
+Filename: pool/main/libs/libsemanage/libsemanage-common_3.5-1build5_all.deb
+
+Package: libsemanage2
+Architecture: arm64
+Version: 3.5-1build5
+Source: libsemanage
+Filename: pool/main/libs/libsemanage/libsemanage2_3.5-1build5_arm64.deb
+
+Package: libsepol2
+Architecture: arm64
+Version: 3.5-2build1
+Source: libsepol
+Filename: pool/main/libs/libsepol/libsepol2_3.5-2build1_arm64.deb
+
+Package: libstemmer0d
+Architecture: arm64
+Version: 2.2.0-4build1
+Source: snowball
+Filename: pool/main/s/snowball/libstemmer0d_2.2.0-4build1_arm64.deb
+
+Package: libxxhash0
+Architecture: arm64
+Version: 0.8.2-2build1
+Source: xxhash
+Filename: pool/main/x/xxhash/libxxhash0_0.8.2-2build1_arm64.deb
+
+Package: libyaml-0-2
+Architecture: arm64
+Version: 0.2.5-1build1
+Source: libyaml
+Filename: pool/main/liby/libyaml/libyaml-0-2_0.2.5-1build1_arm64.deb
+
+Package: lsb-release
+Architecture: all
+Version: 12.0-2
+Source: lsb-release-minimal
+Filename: pool/main/l/lsb-release-minimal/lsb-release_12.0-2_all.deb
+
+Package: mawk
+Architecture: arm64
+Version: 1.3.4.20240123-1build1
+Filename: pool/main/m/mawk/mawk_1.3.4.20240123-1build1_arm64.deb
+
+Package: media-types
+Architecture: all
+Version: 10.1.0
+Filename: pool/main/m/media-types/media-types_10.1.0_all.deb
+
+Package: netbase
+Architecture: all
+Version: 6.4
+Filename: pool/main/n/netbase/netbase_6.4_all.deb
+
+Package: pinentry-curses
+Architecture: arm64
+Version: 1.2.1-3ubuntu5
+Source: pinentry
+Filename: pool/main/p/pinentry/pinentry-curses_1.2.1-3ubuntu5_arm64.deb
+
+Package: python3-blinker
+Architecture: all
+Version: 1.7.0-1
+Source: blinker
+Filename: pool/main/b/blinker/python3-blinker_1.7.0-1_all.deb
+
+Package: python3-cffi-backend
+Architecture: arm64
+Version: 1.16.0-2build1
+Source: python-cffi
+Filename: pool/main/p/python-cffi/python3-cffi-backend_1.16.0-2build1_arm64.deb
+
+Package: python3-dbus
+Architecture: arm64
+Version: 1.3.2-5build3
+Source: dbus-python
+Filename: pool/main/d/dbus-python/python3-dbus_1.3.2-5build3_arm64.deb
+
+Package: python3-distro
+Architecture: all
+Version: 1.9.0-1
+Source: python-distro
+Filename: pool/main/p/python-distro/python3-distro_1.9.0-1_all.deb
+
+Package: python3-gi
+Architecture: arm64
+Version: 3.48.2-1
+Source: pygobject
+Filename: pool/main/p/pygobject/python3-gi_3.48.2-1_arm64.deb
+
+Package: python3-launchpadlib
+Architecture: all
+Version: 1.11.0-6
+Source: python-launchpadlib
+Filename: pool/main/p/python-launchpadlib/python3-launchpadlib_1.11.0-6_all.deb
+
+Package: python3-lazr.restfulclient
+Architecture: all
+Version: 0.14.6-1
+Source: lazr.restfulclient
+Filename: pool/main/l/lazr.restfulclient/python3-lazr.restfulclient_0.14.6-1_all.deb
+
+Package: python3-lazr.uri
+Architecture: all
+Version: 1.0.6-3
+Source: lazr.uri
+Filename: pool/main/l/lazr.uri/python3-lazr.uri_1.0.6-3_all.deb
+
+Package: python3-oauthlib
+Architecture: all
+Version: 3.2.2-1
+Source: python-oauthlib
+Filename: pool/main/p/python-oauthlib/python3-oauthlib_3.2.2-1_all.deb
+
+Package: python3-pyparsing
+Architecture: all
+Version: 3.1.1-1
+Source: pyparsing
+Filename: pool/main/p/pyparsing/python3-pyparsing_3.1.1-1_all.deb
+
+Package: python3-six
+Architecture: all
+Version: 1.16.0-4
+Source: six
+Filename: pool/main/s/six/python3-six_1.16.0-4_all.deb
+
+Package: python3-wadllib
+Architecture: all
+Version: 1.3.6-5
+Source: python-wadllib
+Filename: pool/main/p/python-wadllib/python3-wadllib_1.3.6-5_all.deb
+
+Package: readline-common
+Architecture: all
+Version: 8.2-4build1
+Source: readline
+Filename: pool/main/r/readline/readline-common_8.2-4build1_all.deb
+
+Package: sensible-utils
+Architecture: all
+Version: 0.0.22
+Filename: pool/main/s/sensible-utils/sensible-utils_0.0.22_all.deb
+
+Package: sgml-base
+Architecture: all
+Version: 1.31
+Filename: pool/main/s/sgml-base/sgml-base_1.31_all.deb
+
+Package: sysvinit-utils
+Architecture: arm64
+Version: 3.08-6ubuntu3
+Source: sysvinit
+Filename: pool/main/s/sysvinit/sysvinit-utils_3.08-6ubuntu3_arm64.deb
+
+Package: ubuntu-keyring
+Architecture: all
+Version: 2023.11.28.1
+Filename: pool/main/u/ubuntu-keyring/ubuntu-keyring_2023.11.28.1_all.deb
+
+Package: xml-core
+Architecture: all
+Version: 0.19
+Filename: pool/main/x/xml-core/xml-core_0.19_all.deb
+

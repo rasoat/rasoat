@@ -1,0 +1,11 @@
+services:
+  proxy:
+    image: caddy:2.11.4
+  proxy2:
+    image: caddy:2.11.4-alpine
+  builder:
+    image: caddy:2.11.4-builder
+  fixed:
+    image: caddy:2.11.9
+  floating:
+    image: caddy:2

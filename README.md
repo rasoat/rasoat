@@ -94,7 +94,7 @@ rasoat db update --all      # and every distro release file the index lists
 `discover` judges nothing. Each component has a `kind` (`pin`: a version a file states, a version file or a CI pin; `image`;
 `package`: one package a lockfile resolves), a `product`, a `version` (null when the file names none), `where` (the file) and
 `judged_by`: the data that judges it, `snapshot` (Next.js, WordPress, Node.js, PHP, Bun), `lines` (the image and CI-pin
-families: end of life only), `eco-npm`, `eco-cargo` or `eco-go`; or **null** when no data does. The null ones are what a
+families: end of life only), `advisories` (an exact tag of nginx, Apache httpd, Caddy or Traefik: the vendor's advisories; a floating tag of these is judged by `lines`), `eco-npm`, `eco-cargo` or `eco-go`; or **null** when no data does. The null ones are what a
 scan cannot cover. An image outside the family table lists the tag as written as its version; a reference with a variable in
 it is listed with `unresolved: true`. In the terminal, packages are counted per ecosystem and not listed.
 
@@ -218,8 +218,8 @@ vulnerable packages, 571 in common), the only fixes we missed were ones OSV had 
 **Images and pins, how they are judged.** The product name in a row is the [endoflife.date](https://endoflife.date) id of
 its family, so `postgres`, `timescale/timescaledb:2.32.0-pg17` and `pgvector/pgvector:0.8.7-pg17` are all `postgresql`
 (by the PostgreSQL major the tag names), and `golang` is `go`: PostgreSQL, Redis, nginx, MariaDB, MySQL, ClickHouse,
-Caddy, MongoDB, RabbitMQ, Debian, Ubuntu, Alpine Linux, Python, Go, Rust, Grafana, Prometheus, Meilisearch, Traefik.
-This data has release lines, not advisories, so for these a row is never `ok`:
+Caddy, Apache httpd (`httpd`), MongoDB, RabbitMQ, Debian, Ubuntu, Alpine Linux, Python, Go, Rust, Grafana, Prometheus, Meilisearch, Traefik.
+This data has release lines, not advisories, so for these a row is never `ok`, except nginx, Apache httpd, Caddy and Traefik, whose exact tags are judged against the vendor's advisories:
 
 | Tag | Result |
 |---|---|

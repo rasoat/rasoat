@@ -1,0 +1,11 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: nginx
+Label: nginx
+Suite: stable
+Codename: noble
+Date: Wed, 11 Nov 2026 20:05:30 UTC
+Architectures: amd64 arm64
+Components: nginx
+Description: nginx apt repository

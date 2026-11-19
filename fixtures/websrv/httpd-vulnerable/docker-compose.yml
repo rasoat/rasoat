@@ -1,0 +1,5 @@
+services:
+  web:
+    image: httpd:2.4.70
+  edge:
+    image: httpd:2.4.70-alpine

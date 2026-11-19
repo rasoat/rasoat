@@ -28,6 +28,9 @@ type Release struct {
 	Extended string
 }
 
+// EndedLine is the EOL of a line a product's own advisory list says gets no more releases, when it gives no date.
+const EndedLine = "ended"
+
 // compare orders dotted numeric versions part by part, missing = 0: 16.4 < 16.16, 24.8.4.13 > 24.8.
 func compare(a, b string) int {
 	pa, pb := strings.Split(a, "."), strings.Split(b, ".")
@@ -75,7 +78,9 @@ func lineFor(version string, lines []Release) (Release, bool) {
 	return best, found
 }
 
-func ended(l Release, today string) bool { return l.EOL != "" && l.EOL <= today }
+func ended(l Release, today string) bool {
+	return l.EOL == EndedLine || (l.EOL != "" && l.EOL <= today)
+}
 
 // fixFor is the latest release of the nearest supported line newer than this one, else of the newest supported line.
 func fixFor(l Release, lines []Release, today string) string {
@@ -113,6 +118,9 @@ func Judge(r Ref, lines map[string][]Release, today string) (v core.Verdict, how
 	}
 	ls := lines[r.Family.ID]
 	if len(ls) == 0 {
+		if r.Family.NoEOL { // recognised, with no list of releases and no advisories to read: said plainly, never ok
+			return unknown(r, ReasonNoAdvisory), fmt.Sprintf("no advisory data and no release-line data for %s: it is recognised, and nothing about this version is judged", Name(r.Family.ID))
+		}
 		return unknown(r, ReasonNoLines), ""
 	}
 	l, ok := lineFor(r.Version, ls)
@@ -127,6 +135,9 @@ func Judge(r Ref, lines map[string][]Release, today string) (v core.Verdict, how
 			v.Fix = &fix
 		} else {
 			v.NoFix = true
+		}
+		if l.EOL == EndedLine {
+			return v, fmt.Sprintf("%s line %s has ended", name, l.Cycle)
 		}
 		return v, fmt.Sprintf("%s line %s ended %s", name, l.Cycle, l.EOL)
 	}

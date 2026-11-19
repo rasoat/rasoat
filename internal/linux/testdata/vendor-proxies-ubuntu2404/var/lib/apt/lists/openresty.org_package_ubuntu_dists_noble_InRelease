@@ -1,0 +1,10 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Architectures: i386 amd64 source
+Codename: noble
+Components: main
+Date: Mon, 26 Oct 2026 08:58:21 +0000
+Description: OpenResty Open Source APT Repository
+Label: openresty.org
+Origin: openresty.org

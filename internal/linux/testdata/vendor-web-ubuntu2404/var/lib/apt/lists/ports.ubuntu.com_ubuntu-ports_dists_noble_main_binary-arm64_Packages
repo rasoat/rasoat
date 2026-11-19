@@ -1,0 +1,179 @@
+Package: adduser
+Architecture: all
+Version: 3.137ubuntu1
+Filename: pool/main/a/adduser/adduser_3.137ubuntu1_all.deb
+
+Package: base-passwd
+Architecture: arm64
+Version: 3.6.3build1
+Filename: pool/main/b/base-passwd/base-passwd_3.6.3build1_arm64.deb
+
+Package: bash
+Architecture: arm64
+Version: 5.2.21-2ubuntu4
+Filename: pool/main/b/bash/bash_5.2.21-2ubuntu4_arm64.deb
+
+Package: dash
+Architecture: arm64
+Version: 0.5.12-6ubuntu5
+Filename: pool/main/d/dash/dash_0.5.12-6ubuntu5_arm64.deb
+
+Package: debconf
+Architecture: all
+Version: 1.5.86ubuntu1
+Filename: pool/main/d/debconf/debconf_1.5.86ubuntu1_all.deb
+
+Package: debianutils
+Architecture: arm64
+Version: 5.17build1
+Filename: pool/main/d/debianutils/debianutils_5.17build1_arm64.deb
+
+Package: findutils
+Architecture: arm64
+Version: 4.9.0-5build1
+Filename: pool/main/f/findutils/findutils_4.9.0-5build1_arm64.deb
+
+Package: grep
+Architecture: arm64
+Version: 3.11-4build1
+Filename: pool/main/g/grep/grep_3.11-4build1_arm64.deb
+
+Package: hostname
+Architecture: arm64
+Version: 3.23+nmu2ubuntu2
+Filename: pool/main/h/hostname/hostname_3.23+nmu2ubuntu2_arm64.deb
+
+Package: init-system-helpers
+Architecture: all
+Version: 1.66ubuntu1
+Filename: pool/main/i/init-system-helpers/init-system-helpers_1.66ubuntu1_all.deb
+
+Package: libassuan0
+Architecture: arm64
+Version: 2.5.6-1build1
+Source: libassuan
+Filename: pool/main/liba/libassuan/libassuan0_2.5.6-1build1_arm64.deb
+
+Package: libcap-ng0
+Architecture: arm64
+Version: 0.8.4-2build2
+Source: libcap-ng
+Filename: pool/main/libc/libcap-ng/libcap-ng0_0.8.4-2build2_arm64.deb
+
+Package: libcrypt1
+Architecture: arm64
+Version: 1:4.4.36-4build1
+Source: libxcrypt
+Filename: pool/main/libx/libxcrypt/libcrypt1_4.4.36-4build1_arm64.deb
+
+Package: libdb5.3t64
+Architecture: arm64
+Version: 5.3.28+dfsg2-7
+Source: db5.3
+Filename: pool/main/d/db5.3/libdb5.3t64_5.3.28+dfsg2-7_arm64.deb
+
+Package: libdebconfclient0
+Architecture: arm64
+Version: 0.271ubuntu3
+Source: cdebconf
+Filename: pool/main/c/cdebconf/libdebconfclient0_0.271ubuntu3_arm64.deb
+
+Package: libffi8
+Architecture: arm64
+Version: 3.4.6-1build1
+Source: libffi
+Filename: pool/main/libf/libffi/libffi8_3.4.6-1build1_arm64.deb
+
+Package: libkeyutils1
+Architecture: arm64
+Version: 1.6.3-3build1
+Source: keyutils
+Filename: pool/main/k/keyutils/libkeyutils1_1.6.3-3build1_arm64.deb
+
+Package: libksba8
+Architecture: arm64
+Version: 1.6.6-1build1
+Source: libksba
+Filename: pool/main/libk/libksba/libksba8_1.6.6-1build1_arm64.deb
+
+Package: libnpth0t64
+Architecture: arm64
+Version: 1.6-3.1build1
+Source: npth
+Filename: pool/main/n/npth/libnpth0t64_1.6-3.1build1_arm64.deb
+
+Package: libpsl5t64
+Architecture: arm64
+Version: 0.21.2-1.1build1
+Source: libpsl
+Filename: pool/main/libp/libpsl/libpsl5t64_0.21.2-1.1build1_arm64.deb
+
+Package: libreadline8t64
+Architecture: arm64
+Version: 8.2-4build1
+Source: readline
+Filename: pool/main/r/readline/libreadline8t64_8.2-4build1_arm64.deb
+
+Package: librtmp1
+Architecture: arm64
+Version: 2.4+20151223.gitfa8646d.1-2build7
+Source: rtmpdump
+Filename: pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2build7_arm64.deb
+
+Package: libsemanage-common
+Architecture: all
+Version: 3.5-1build5
+Source: libsemanage
+Filename: pool/main/libs/libsemanage/libsemanage-common_3.5-1build5_all.deb
+
+Package: libsemanage2
+Architecture: arm64
+Version: 3.5-1build5
+Source: libsemanage
+Filename: pool/main/libs/libsemanage/libsemanage2_3.5-1build5_arm64.deb
+
+Package: libsepol2
+Architecture: arm64
+Version: 3.5-2build1
+Source: libsepol
+Filename: pool/main/libs/libsepol/libsepol2_3.5-2build1_arm64.deb
+
+Package: libxxhash0
+Architecture: arm64
+Version: 0.8.2-2build1
+Source: xxhash
+Filename: pool/main/x/xxhash/libxxhash0_0.8.2-2build1_arm64.deb
+
+Package: mawk
+Architecture: arm64
+Version: 1.3.4.20240123-1build1
+Filename: pool/main/m/mawk/mawk_1.3.4.20240123-1build1_arm64.deb
+
+Package: pinentry-curses
+Architecture: arm64
+Version: 1.2.1-3ubuntu5
+Source: pinentry
+Filename: pool/main/p/pinentry/pinentry-curses_1.2.1-3ubuntu5_arm64.deb
+
+Package: readline-common
+Architecture: all
+Version: 8.2-4build1
+Source: readline
+Filename: pool/main/r/readline/readline-common_8.2-4build1_all.deb
+
+Package: sensible-utils
+Architecture: all
+Version: 0.0.22
+Filename: pool/main/s/sensible-utils/sensible-utils_0.0.22_all.deb
+
+Package: sysvinit-utils
+Architecture: arm64
+Version: 3.08-6ubuntu3
+Source: sysvinit
+Filename: pool/main/s/sysvinit/sysvinit-utils_3.08-6ubuntu3_arm64.deb
+
+Package: ubuntu-keyring
+Architecture: all
+Version: 2023.11.28.1
+Filename: pool/main/u/ubuntu-keyring/ubuntu-keyring_2023.11.28.1_all.deb
+

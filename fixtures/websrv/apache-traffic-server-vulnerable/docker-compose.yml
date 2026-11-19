@@ -1,0 +1,5 @@
+services:
+  s1:
+    image: trafficserver/trafficserver:10.2.0
+  s2:
+    image: trafficserver/trafficserver:10.1.3

@@ -1,0 +1,23 @@
+Package: apache2
+Architecture: arm64
+Version: 2.4.71-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/a/apache2/apache2_2.4.71-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+
+Package: apache2-bin
+Source: apache2
+Architecture: arm64
+Version: 2.4.71-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/a/apache2/apache2-bin_2.4.71-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+
+Package: apache2-data
+Source: apache2
+Architecture: all
+Version: 2.4.71-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/a/apache2/apache2-data_2.4.71-1+ubuntu24.04.1+deb.sury.org+1_all.deb
+
+Package: apache2-utils
+Source: apache2
+Architecture: arm64
+Version: 2.4.71-1+ubuntu24.04.1+deb.sury.org+1
+Filename: pool/main/a/apache2/apache2-utils_2.4.71-1+ubuntu24.04.1+deb.sury.org+1_arm64.deb
+

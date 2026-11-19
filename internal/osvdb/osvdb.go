@@ -11,6 +11,17 @@ import (
 	"github.com/rasoat/rasoat/internal/deps"
 )
 
+// safeID: an advisory id comes from downloaded data and reaches a URL and a terminal.
+var safeID = core.NewRe(`^[A-Za-z0-9._-]{1,64}$`)
+
+// AdvisoryURL is where an advisory id is read; false for an id that is not safe to print or link.
+func AdvisoryURL(id string) (string, bool) {
+	if !safeID.MatchString(id) {
+		return "", false
+	}
+	return "https://osv.dev/vulnerability/" + id, true
+}
+
 // File is the data file of an ecosystem.
 var File = map[string]string{deps.NPM: "eco-npm", deps.Cargo: "eco-cargo", deps.Go: "eco-go"}
 

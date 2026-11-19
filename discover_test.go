@@ -19,7 +19,7 @@ func inventoryDir(t *testing.T) string {
 	write(t, d, "Cargo.lock", "version = 4\n\n[[package]]\nname = \"bytes\"\nversion = \"1.12.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n\n[[package]]\nname = \"tokio\"\nversion = \"1.53.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n")
 	write(t, d, "Dockerfile", "FROM oven/bun:1.4.4\n")
 	write(t, d, ".nvmrc", "22.3.0\n")
-	write(t, d, "docker-compose.yml", "services:\n  db:\n    image: postgres:16-alpine\n  mail:\n    image: axllent/mailpit:3.1.0\n  app:\n    image: ${REGISTRY}/app:${TAG}\n")
+	write(t, d, "docker-compose.yml", "services:\n  db:\n    image: postgres:16-alpine\n  mail:\n    image: axllent/mailpit:3.1.0\n  app:\n    image: ${REGISTRY}/app:${TAG}\n  web:\n    image: httpd:2.4.71\n")
 	write(t, d, ".github/workflows/ci.yml", "jobs:\n  t:\n    steps:\n      - uses: actions/setup-go@v5\n        with: { go-version: 1.22.5 }\n")
 	return d
 }
@@ -64,14 +64,15 @@ func TestDiscoverListsEveryComponentAndWhatJudgesIt(t *testing.T) {
 		by[key], where[key] = judged, i["where"].(string)
 	}
 	want := map[string]string{
-		"pin next 14.2.3":                "snapshot",
-		"pin node 22.3.0":                "snapshot",
-		"pin bun 1.4.4":                  "snapshot",
-		"image postgresql 16":            "lines",
-		"pin go 1.22.5":                  "lines",
-		"image axllent/mailpit 3.1.0":    "", // no family: the tag as written
-		"package pkg:cargo/tokio 1.53.1": "eco-cargo",
-		"package pkg:cargo/bytes 1.12.1": "eco-cargo",
+		"pin next 14.2.3":                 "snapshot",
+		"pin node 22.3.0":                 "snapshot",
+		"pin bun 1.4.4":                   "snapshot",
+		"image postgresql 16":             "lines",
+		"image apache-http-server 2.4.71": "advisories", // an exact tag of a family with advisory data: not "lines" only
+		"pin go 1.22.5":                   "lines",
+		"image axllent/mailpit 3.1.0":     "", // no family: the tag as written
+		"package pkg:cargo/tokio 1.53.1":  "eco-cargo",
+		"package pkg:cargo/bytes 1.12.1":  "eco-cargo",
 	}
 	for k, judged := range want {
 		if got, ok := by[k]; !ok || got != judged {
@@ -183,5 +184,36 @@ func TestHelpListsDiscoverAndDb(t *testing.T) {
 	}
 	if r := rasoat(t, t.TempDir(), nil, "", "db", "wipe"); r.code != 2 {
 		t.Errorf("an unknown db command is a usage error: %d", r.code)
+	}
+}
+
+// discover says what judges each proxy image: its advisories, release lines, or none (recognised, nothing judges it). A
+// recognised-only product counts as not judged, and a scan report lists it under not_judged.
+func TestDiscoverLabelsWebServersByWhatJudgesThem(t *testing.T) {
+	env, _ := noNetwork(t)
+	r := rasoat(t, t.TempDir(), env, "", "discover", fixture("websrv/recognised-only"), "--json")
+	if r.code != 0 {
+		t.Fatalf("exit %d: %s", r.code, r.stderr)
+	}
+	var v rep
+	if err := json.Unmarshal([]byte(r.stdout), &v); err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]string{}
+	for _, i := range items(v) {
+		got[i["product"].(string)], _ = i["judged_by"].(string)
+	}
+	want := map[string]string{"kong-gateway": "lines", "litespeed": "none", "openlitespeed": "none"}
+	for k, w := range want {
+		if got[k] != w {
+			t.Errorf("%s: judged_by %q, want %q", k, got[k], w)
+		}
+	}
+	if s := v["summary"].(rep); s["judged"] != 2.0 || s["not_judged"] != 2.0 {
+		t.Errorf("summary %v", s)
+	}
+	r = rasoat(t, t.TempDir(), env, "", "discover", fixture("websrv/envoy-fixed"), "--json")
+	if !strings.Contains(r.stdout, `"judged_by": "advisories"`) {
+		t.Errorf("%s", r.stdout)
 	}
 }

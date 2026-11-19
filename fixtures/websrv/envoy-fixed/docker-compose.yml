@@ -1,0 +1,5 @@
+services:
+  s1:
+    image: envoyproxy/envoy:v1.38.9
+  s2:
+    image: envoyproxy/envoy:distroless-v1.37.11

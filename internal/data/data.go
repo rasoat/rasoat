@@ -27,8 +27,8 @@ var bundledBytes []byte
 var bundledMeta []byte
 
 type meta struct {
-	Built  string `json:"built"`
-	Counts []int  `json:"counts"`
+	Built  string         `json:"built"`
+	Counts map[string]int `json:"counts"`
 }
 
 const (

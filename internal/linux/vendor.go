@@ -10,8 +10,8 @@ import (
 	"github.com/rasoat/rasoat/internal/images"
 )
 
-// A vendor package is judged as the product it is, never against the distro's fixes (see origin.go). Four vendor products
-// have a verdict in this program; every other vendor package is counted in a note, never read as clean.
+// A vendor package is judged as the product it is, never against the distro's fixes (see origin.go). The vendor products named below
+// have a verdict in this program (php, node, postgresql, mariadb, nginx, Caddy, httpd, HAProxy, Varnish, OpenResty, Angie); every other vendor package is counted in a note, never read as clean.
 
 // vendorKey names a vendor from an apt Origin, an rpm Vendor or a marker. "" for one this program does not route.
 func vendorKey(label string) string {
@@ -19,6 +19,10 @@ func vendorKey(label string) string {
 	for _, k := range []struct{ frag, key string }{
 		{"ondrej", "sury"}, {"sury", "sury"}, {"postgresql", "pgdg"}, {"pgdg", "pgdg"},
 		{"node source", "nodesource"}, {"nodesource", "nodesource"}, {"maria", "mariadb"}, {"remi", "remi"},
+		{"nginx", "nginx"}, {"caddy", "caddy"},
+		// Release Origins read from the vendors' own repos: LP-PPA-vbernat-haproxy-3.2 and PPA-haproxy (haproxy.debian.net),
+		// packagecloud.io/varnishcache/varnish75, openresty.org, angie.
+		{"haproxy", "haproxy"}, {"varnishcache", "varnish"}, {"openresty", "openresty"}, {"angie", "angie"},
 	} {
 		if strings.Contains(low, k.frag) {
 			return k.key
@@ -47,6 +51,13 @@ func vendorProduct(key, source string) string {
 		return "postgresql"
 	case key == "mariadb" && mariaSrc.MatchString(source):
 		return "mariadb"
+	case key == "nginx" && source == "nginx", key == "caddy" && source == "caddy":
+		return source
+	case key == "haproxy" && source == "haproxy", key == "varnish" && source == "varnish",
+		key == "openresty" && source == "openresty", key == "angie" && source == "angie":
+		return source
+	case key == "sury" && source == "apache2": // ondrej's Apache build: 2.4.71-1+ubuntu24.04.1+deb.sury.org+1
+		return "apache-http-server"
 	}
 	return ""
 }
@@ -105,6 +116,12 @@ func judgeVendors(pkgs []Package, index *Index, o Options) (rows []Finding, note
 	sort.Strings(keys)
 	var snapshot *core.Snapshot
 	loaded := false
+	load := func() *core.Snapshot { // the snapshot is loaded once, however many rows ask
+		if !loaded && o.Snapshot != nil {
+			snapshot, loaded = o.Snapshot(), true
+		}
+		return snapshot
+	}
 	var lines map[string][]images.Release
 	for _, k := range keys {
 		g := groups[k]
@@ -112,16 +129,13 @@ func judgeVendors(pkgs []Package, index *Index, o Options) (rows []Finding, note
 		how := ""
 		switch g.product {
 		case "php", "node":
-			if !loaded && o.Snapshot != nil {
-				snapshot, loaded = o.Snapshot(), true
-			}
-			if snapshot == nil {
+			if load() == nil {
 				reason := "no-advisory-data"
 				version := g.version
 				v = core.Verdict{Product: g.product, Version: &version, Status: core.Unknown, Reason: &reason, Advisories: []core.VerdictAdvisory{}}
 			} else {
 				version := g.version
-				v = core.VerdictFor(g.product, &version, snapshot, o.Today)
+				v = core.VerdictFor(g.product, &version, load(), o.Today)
 			}
 		default:
 			if lines == nil && index != nil {
@@ -131,9 +145,11 @@ func judgeVendors(pkgs []Package, index *Index, o Options) (rows []Finding, note
 						lines[id] = append(lines[id], images.Release(l))
 					}
 				}
+				lines = images.WithServerLines(lines, load()) // the families endoflife.date has no table for: lines from their advisory lists
 			}
-			image := map[string]string{"postgresql": "postgres", "mariadb": "mariadb"}[g.product]
-			v, how = images.Judge(images.ParseRef(image+":"+g.version), lines, o.Today)
+			image := map[string]string{"postgresql": "postgres", "mariadb": "mariadb", "nginx": "nginx", "caddy": "caddy", "apache-http-server": "httpd",
+				"haproxy": "haproxy", "varnish": "varnish", "angie": "angie", "openresty": "openresty/openresty"}[g.product]
+			v, how = images.JudgeWith(images.ParseRef(image+":"+g.version), lines, o.Today, o.Exact)
 		}
 		sort.Strings(g.bins)
 		built := fmt.Sprintf("vendor build %s, origin read by %s", g.origin, g.decided)

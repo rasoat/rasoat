@@ -44,7 +44,7 @@ func InventoryOf(root string, w project.Walked, withPackages bool) *Inventory {
 		inv.Summary.Components++
 		if it.Acknowledged {
 			inv.Summary.Acknowledged++
-		} else if it.JudgedBy == nil {
+		} else if !it.Judged() {
 			inv.Summary.NotJudged++
 		} else {
 			inv.Summary.Judged++

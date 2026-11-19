@@ -19,6 +19,7 @@ import (
 	"github.com/rasoat/rasoat/internal/report"
 	"github.com/rasoat/rasoat/internal/rules"
 	"github.com/rasoat/rasoat/internal/site"
+	"github.com/rasoat/rasoat/internal/websrv"
 )
 
 // UserAgent says what is asking, and nothing about what is being scanned.
@@ -60,7 +61,8 @@ func Host(root, kernel string, offline bool) (*report.Report, error) {
 		root, shown = "/", "this machine"
 	}
 	snapshot := func() *core.Snapshot { return data.Load(offline, UserAgent).Snapshot }
-	h, err := linux.Scan(linux.Options{Root: root, Kernel: kernel, Offline: offline, UserAgent: UserAgent, Snapshot: snapshot})
+	exact := (&websrv.Judge{Snapshot: snapshot, Offline: offline, UserAgent: UserAgent}).Exact
+	h, err := linux.Scan(linux.Options{Root: root, Kernel: kernel, Offline: offline, UserAgent: UserAgent, Snapshot: snapshot, Exact: exact})
 	if err != nil {
 		return nil, err
 	}
@@ -97,11 +99,15 @@ func Target(target string, offline, public bool, rs *rules.Set) (*report.Report,
 				}
 			}
 		}
+		if slices.ContainsFunc(w.Images, func(i project.Image) bool { return i.Family != nil }) {
+			lines = images.WithServerLines(lines, l.Snapshot) // the families endoflife.date has no table for: lines from their advisory lists
+		}
 		var d *osvdb.Outcome
 		if len(w.Pkgs) > 0 {
 			d = osvdb.Scan(w.Pkgs, offline, UserAgent)
 		}
-		return report.Dir(dir, w, l, lines, d), l, nil
+		exact := (&websrv.Judge{Snapshot: func() *core.Snapshot { return l.Snapshot }, Offline: offline, UserAgent: UserAgent}).Exact
+		return report.Dir(dir, w, l, lines, d, exact), l, nil
 	}
 	o, err := site.Inspect(url, site.NewGet(UserAgent, public), l.Snapshot.Requirements)
 	if err != nil {

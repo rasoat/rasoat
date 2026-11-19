@@ -16,6 +16,7 @@ type contract struct {
 	Rows      [][]any `json:"rows"`
 	Satisfies [][]any `json:"satisfies"`
 	Orders    [][]any `json:"orders"`
+	Servers   [][]any `json:"servers"`
 }
 
 // The file is what the web app's TypeScript core answers (scripts/cli/conformance.ts). The two must not drift.

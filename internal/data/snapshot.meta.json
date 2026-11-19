@@ -1,1 +1,1 @@
-{"built":"2026-11-12","counts":[77,352,204,737,3]}
+{"built":"2026-11-19","counts":{"next":79,"wordpress":352,"node":204,"php":737,"bun":3,"server:nginx":74,"server:apache-http-server":291,"server:squid":47,"server:envoy":132,"server:apache-traffic-server":77,"server:haproxy":13,"server:varnish":13,"server:vinyl-cache":13,"server:angie":35}}

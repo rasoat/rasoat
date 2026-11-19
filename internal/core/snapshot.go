@@ -89,6 +89,9 @@ type Snapshot struct {
 	WordPress    WpData            `json:"wordpress"`
 	Runtimes     map[string]RtData `json:"runtimes"`
 	Requirements Requirements      `json:"requirements"`
+	// Servers: each web server or proxy's advisory list in the shared shape, by family id. Absent from a snapshot that predates
+	// it; a list that does not read is dropped alone: that product is then not judged.
+	Servers map[string]*ServerAdvisories `json:"servers"`
 }
 
 var (
@@ -149,18 +152,30 @@ func (s *Snapshot) valid() bool {
 			}
 		}
 	}
+	for id, l := range s.Servers {
+		if l == nil || l.Product != id || !ValidServer(l) {
+			delete(s.Servers, id)
+		}
+	}
 	return s.Requirements.Next != nil && s.Requirements.WordPress != nil
 }
 
-// Counts are the records per dataset, in a fixed order.
-func (s *Snapshot) Counts() []int {
-	return []int{len(s.Next.Advisories), len(s.WordPress.CVEs), len(s.Runtimes["node"].Vulns), len(s.Runtimes["php"].Vulns), len(s.Runtimes["bun"].Vulns)}
+// Counts are the records per dataset, by name (the TypeScript snapshotCounts): one entry per product list in Servers.
+func (s *Snapshot) Counts() map[string]int {
+	out := map[string]int{"next": len(s.Next.Advisories), "wordpress": len(s.WordPress.CVEs)}
+	for _, id := range []string{"node", "php", "bun"} {
+		out[id] = len(s.Runtimes[id].Vulns)
+	}
+	for id, l := range s.Servers {
+		out["server:"+id] = len(l.Advisories)
+	}
+	return out
 }
 
 // KeepsCoverage is false when a newer-looking snapshot lost so many records that it would call vulnerable versions clean.
-func KeepsCoverage(candidate, floor []int) bool {
-	for i := range floor {
-		if float64(candidate[i]) < float64(floor[i])*0.9 {
+func KeepsCoverage(candidate, floor map[string]int) bool {
+	for name, n := range floor {
+		if float64(candidate[name]) < float64(n)*0.9 {
 			return false
 		}
 	}

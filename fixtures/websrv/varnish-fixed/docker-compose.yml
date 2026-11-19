@@ -1,0 +1,5 @@
+services:
+  s1:
+    image: varnish:9.1.0
+  s2:
+    image: varnish:9.0.4-5

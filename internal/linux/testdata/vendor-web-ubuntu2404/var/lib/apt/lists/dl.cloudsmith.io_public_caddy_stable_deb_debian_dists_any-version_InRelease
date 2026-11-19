@@ -1,0 +1,11 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: cloudsmith/caddy/stable
+Codename: any-version
+Date: Thu, 05 Nov 2026 01:28:28 UTC
+Architectures: amd64 arm64 armel armhf armv7l i386 ppc64el riscv64 s390x
+Components: main multiverse restricted universe
+Suite: any-version
+Label: source=none
+Acquire-By-Hash: yes

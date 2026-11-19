@@ -1,0 +1,9 @@
+services:
+  s1:
+    image: litespeedtech/openlitespeed:1.9.4-lsphp84
+  s2:
+    image: litespeedtech/litespeed:6.3.7-lsphp83
+  s3:
+    image: kong:3.9.4
+  s4:
+    image: kong/kong-gateway:3.16.0.2-ubuntu

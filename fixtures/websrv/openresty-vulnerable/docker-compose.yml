@@ -1,0 +1,5 @@
+services:
+  s1:
+    image: openresty/openresty:1.27.1.2-alpine
+  s2:
+    image: openresty/openresty:1.29.2.5-bookworm-fat

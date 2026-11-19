@@ -1,0 +1,12 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: LP-PPA-ondrej-apache2
+Label: PPA for Apache 2
+Suite: noble
+Version: 24.04
+Codename: noble
+Date: Thu, 12 Nov 2026  4:30:16 UTC
+Architectures: amd64 arm64 armhf i386 ppc64el riscv64 s390x
+Components: main
+Description: Ubuntu Noble 24.04
