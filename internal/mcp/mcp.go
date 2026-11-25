@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/rasoat/rasoat/internal/core"
 	"github.com/rasoat/rasoat/internal/localdb"
 	"github.com/rasoat/rasoat/internal/report"
 	"github.com/rasoat/rasoat/internal/rules"
@@ -144,7 +145,7 @@ func callHost(args obj) obj {
 		}
 		offline = b
 	}
-	rep, err := scan.Host("", "", offline)
+	rep, err := scan.Host(scan.HostOptions{Offline: offline})
 	if err != nil {
 		return failure(clipStr(err.Error()))
 	}
@@ -232,7 +233,9 @@ func call(name string, args obj) obj {
 		return failure("Scan failed: " + clipStr(err.Error()))
 	}
 	if name == "fix_plan" {
-		return result(report.Plan(rep, l))
+		p := report.Plan(rep, l)
+		core.SanitizeTree(p)
+		return result(p)
 	}
 	return result(rep)
 }

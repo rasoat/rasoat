@@ -38,6 +38,13 @@ func TestParseRefProxies(t *testing.T) {
 		"kong:3.9.4":                                   "kong-gateway exact 3.9.4",
 		"kong/kong-gateway:3.16.0.2-ubuntu":            "kong-gateway exact 3.16.0.2",
 		"kong:ubuntu":                                  "kong-gateway unpinned ",
+		"valkey/valkey:9.2-alpine3.24":                 "valkey line 9.2",
+		"valkey/valkey:9.2.1":                          "valkey exact 9.2.1",
+		"valkey/valkey:unstable":                       "valkey unpinned ",
+		"clamav/clamav:1.4.7-debian13-slim":            "clamav exact 1.4.7",
+		"clamav/clamav:1.4-debian":                     "clamav line 1.4",
+		"louislam/uptime-kuma:2.0.2":                   "uptime-kuma exact 2.0.2",
+		"louislam/uptime-kuma:nightly":                 "uptime-kuma unpinned ",
 	} {
 		if got := row(ParseRef(raw)); got != want {
 			t.Errorf("%s: got %q, want %q", raw, got, want)
@@ -46,7 +53,7 @@ func TestParseRefProxies(t *testing.T) {
 }
 
 func TestRecognisedOnlyFamiliesAreNeverOk(t *testing.T) {
-	for _, raw := range []string{"litespeedtech/openlitespeed:1.9.4-lsphp84", "litespeedtech/litespeed:6.3.7-lsphp83"} {
+	for _, raw := range []string{"litespeedtech/openlitespeed:1.9.4-lsphp84", "litespeedtech/litespeed:6.3.7-lsphp83", "valkey/valkey:9.2.1", "clamav/clamav:1.4.7-debian13-slim", "louislam/uptime-kuma:2.0.2"} {
 		v, how := Judge(ParseRef(raw), nil, "2026-11-19")
 		if v.Status != core.Unknown || v.Reason == nil || *v.Reason != ReasonNoAdvisory || !strings.Contains(how, "no advisory data and no release-line data") {
 			t.Errorf("%s: %+v %q", raw, v, how)

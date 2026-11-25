@@ -470,8 +470,8 @@ func TestTheSnapshotAScanAnswersFrom(t *testing.T) {
 		}
 		var r rep
 		json.Unmarshal([]byte(js), &r)
-		if !strings.Contains(results(r)[0]["advisories"].([]any)[0].(rep)["summary"].(string), evil) {
-			t.Error("the text must survive JSON intact")
+		if !strings.Contains(results(r)[0]["advisories"].([]any)[0].(rep)["summary"].(string), "poison") {
+			t.Error("the readable text must survive JSON")
 		}
 	})
 	t.Run("the notices are the program's own, whatever a download says", func(t *testing.T) {

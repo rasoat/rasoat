@@ -6,9 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -25,44 +23,25 @@ type Package struct {
 	Decided       string // how: "apt-lists", "rpm-vendor", "version-marker"; empty when nothing decided and the distro is assumed
 }
 
-const maxDB = 512 << 20
-
-func openFile(root, rel string) (*os.File, error) {
-	if root == "/" {
-		return os.Open(filepath.Join(root, rel))
-	}
-	return os.OpenInRoot(root, rel)
-}
-
-// readFile reads a file under root, within the size limit. Under a mounted image every path, symlinks included, stays inside
-// the image: a hostile image cannot make this read the machine it is examined on. On this machine's own "/" nothing can escape.
-func readFile(root, rel string) ([]byte, error) {
-	f, err := openFile(root, rel)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	b, err := io.ReadAll(io.LimitReader(f, maxDB+1))
-	if err != nil {
-		return nil, err
-	}
-	if len(b) > maxDB {
-		return nil, errors.New(rel + ": too large")
-	}
-	return b, nil
-}
-
 // ReadPackages reads the package database of a family. os.ErrNotExist: this machine has none.
 func ReadPackages(root, family string) ([]Package, error) {
+	pkgs, _, err := readPackages(root, family)
+	return pkgs, err
+}
+
+// readPackages also returns the notes: what was left unread.
+func readPackages(root, family string) ([]Package, []string, error) {
 	switch family {
 	case "deb":
 		return readDpkg(root)
 	case "rpm":
-		return readRPM(root)
+		pkgs, err := readRPM(root)
+		return pkgs, nil, err
 	case "apk":
-		return readApk(root)
+		pkgs, err := readApk(root)
+		return pkgs, nil, err
 	}
-	return nil, os.ErrNotExist
+	return nil, nil, os.ErrNotExist
 }
 
 func stanzaValue(line []byte, key string) (string, bool) {
@@ -117,32 +96,36 @@ func parseDpkg(data []byte, out []Package) []Package {
 	return out
 }
 
-func readDpkg(root string) ([]Package, error) {
+func readDpkg(root string) ([]Package, []string, error) {
 	var out []Package
-	data, err := readFile(root, "var/lib/dpkg/status")
+	var notes []string
+	data, err := readFile(root, "var/lib/dpkg/status", maxDpkgStatus)
 	if err == nil {
 		out = parseDpkg(data, out)
 	}
 	// Distroless images keep one small status file per package here, with no Status line needing a package manager.
-	if entries, e := os.ReadDir(filepath.Join(root, "var/lib/dpkg/status.d")); e == nil {
-		for _, en := range entries {
-			if strings.HasSuffix(en.Name(), ".md5sums") {
+	if names, truncated, e := listDir(root, "var/lib/dpkg/status.d"); e == nil {
+		for _, name := range names {
+			if strings.HasSuffix(name, ".md5sums") {
 				continue
 			}
-			if b, e := readFile(root, "var/lib/dpkg/status.d/"+en.Name()); e == nil {
+			if b, e := readFile(root, "var/lib/dpkg/status.d/"+name, maxDpkgEntry); e == nil {
 				out = parseDpkg(b, out)
 			}
 		}
+		if truncated {
+			notes = append(notes, tooManyFiles)
+		}
 		err = nil
 	}
-	return out, err
+	return out, notes, err
 }
 
 func readApk(root string) ([]Package, error) {
 	var data []byte
 	var err error
 	for _, p := range []string{"lib/apk/db/installed", "usr/lib/apk/db/installed"} {
-		if data, err = readFile(root, p); err == nil {
+		if data, err = readFile(root, p, maxApkDB); err == nil {
 			break
 		}
 	}
@@ -196,7 +179,7 @@ func readRPM(root string) ([]Package, error) {
 		{"var/lib/rpm/Packages", readBDB},
 	}
 	for _, p := range paths {
-		data, err := readFile(root, p.rel)
+		data, err := readFile(root, p.rel, maxRPMDB)
 		if errors.Is(err, os.ErrNotExist) {
 			continue
 		}
@@ -334,7 +317,7 @@ func (d *sqliteDB) page(n uint32) []byte {
 // cellPayload returns a leaf cell's record, following its overflow chain.
 func (d *sqliteDB) cellPayload(cell []byte) []byte {
 	size, n := varint(cell)
-	if n == 0 || size > maxDB {
+	if n == 0 || size > uint64(len(d.data)) { // no record outweighs the file that holds it
 		return nil
 	}
 	_, m := varint(cell[n:])
@@ -367,9 +350,10 @@ func (d *sqliteDB) cellPayload(cell []byte) []byte {
 	next := binary.BigEndian.Uint32(body[local:])
 	for next != 0 && len(out) < int(size) {
 		p := d.page(next)
-		if p == nil || u > len(p) {
+		if p == nil || u > len(p) || d.seen[next] { // an overflow page belongs to one chain: a cycle adds nothing
 			return nil
 		}
+		d.seen[next] = true
 		next = binary.BigEndian.Uint32(p)
 		take := min(u-4, int(size)-len(out))
 		out = append(out, p[4:4+take]...)
@@ -519,6 +503,7 @@ func readBDB(data []byte) ([][]byte, error) {
 		return data[start : start+uint64(pageSize)]
 	}
 	var out [][]byte
+	overflow := map[uint32]bool{}
 	for n := uint32(1); n <= last; n++ {
 		p := page(n)
 		if p == nil {
@@ -542,15 +527,16 @@ func readBDB(data []byte) ([][]byte, error) {
 					continue
 				}
 				pgno, total := bo.Uint32(p[at+4:]), bo.Uint32(p[at+8:])
-				if total > maxDB {
+				if uint64(total) > uint64(len(data)) {
 					continue
 				}
-				blob := make([]byte, 0, min(total, uint32(len(data))))
+				var blob []byte
 				for pgno != 0 && uint32(len(blob)) < total {
 					o := page(pgno)
-					if o == nil || o[25] != 7 {
+					if o == nil || o[25] != 7 || overflow[pgno] { // each overflow page once: a cycle cannot loop
 						break
 					}
+					overflow[pgno] = true
 					use := int(bo.Uint16(o[22:]))
 					if use == 0 || 26+use > len(o) {
 						break

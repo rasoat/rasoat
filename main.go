@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/rasoat/rasoat/internal/core"
 	"github.com/rasoat/rasoat/internal/hook"
@@ -36,6 +38,7 @@ Options:
   --all         list every advisory, not the worst 5; db update: also every distro release file
   --lang vi|en  default: from LANG
   --root DIR    host: read a mounted image or container tree instead of this machine
+  --name LABEL  host: the name to report as target instead of the --root path
   --kernel V    host: judge this kernel version instead of the running one
   --rules FILE  your own detectors (default: $XDG_CONFIG_HOME/rasoat/rules.json or ~/.config/rasoat/rules.json); never read from a scanned directory
   -h, --help    -v, --version
@@ -58,7 +61,7 @@ Exit:    0 all clean, 1 vulnerable or unsupported, 2 usage or error, 3 nothing o
 
 type options struct {
 	json, offline, all, help, version bool
-	lang, root, kernel, rules         string
+	lang, root, kernel, rules, name   string
 	positionals                       []string
 }
 
@@ -85,6 +88,18 @@ func parse(args []string) (options, error) {
 			o.lang = args[i]
 		case strings.HasPrefix(a, "--lang="):
 			o.lang = strings.TrimPrefix(a, "--lang=")
+		case a == "--name" || strings.HasPrefix(a, "--name="):
+			v := strings.TrimPrefix(a, "--name=")
+			if a == "--name" {
+				if i++; i == len(args) {
+					return o, errors.New("--name needs a value")
+				}
+				v = args[i]
+			}
+			if v == "" || utf8.RuneCountInString(v) > 100 || strings.ContainsFunc(v, unicode.IsControl) {
+				return o, errors.New("--name needs 1 to 100 characters, none of them a control character")
+			}
+			o.name = v
 		case a == "--root" || a == "--kernel" || a == "--rules":
 			i++
 			if i == len(args) {
@@ -232,7 +247,7 @@ func run(args []string) int {
 		return 0
 	}
 	if command == "host" {
-		rep, err := scan.Host(o.root, o.kernel, o.offline)
+		rep, err := scan.Host(scan.HostOptions{Root: o.root, Kernel: o.kernel, Name: o.name, Offline: o.offline})
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 2

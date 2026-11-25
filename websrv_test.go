@@ -10,8 +10,12 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/rasoat/rasoat/internal/core"
+	"github.com/rasoat/rasoat/internal/data"
 )
 
 // webData serves the Go ecosystem file and an index. lines is the index's "lines" object, or "" for none.
@@ -60,17 +64,51 @@ func TestScanJudgesAnExactNginxTag(t *testing.T) {
 		t.Fatalf("exit %d, rows %v", code, rows)
 	}
 	r := rows["nginx 1.31.8"]
-	if r["status"] != "vulnerable" || r["fix"] != "1.31.9" || !slices.Contains(advisoryIDs(r), "CVE-2026-123007") || !slices.Contains(advisoryIDs(r), "CVE-2026-123633") {
+	if r["status"] != "vulnerable" || r["fix"] != cleanNginx(t, "1.31") || !slices.Contains(advisoryIDs(r), "CVE-2026-123007") || !slices.Contains(advisoryIDs(r), "CVE-2026-123633") {
 		t.Errorf("1.31.8: %v", r)
 	}
 	// -alpine is a variant of the same release; 1.30 is its own branch, fixed on its own branch.
-	if r := rows["nginx 1.30.6"]; r["status"] != "vulnerable" || r["fix"] != "1.30.7" || !strings.Contains(str(r["sources"].([]any)[0]), "nginx:1.30.6-alpine") {
+	if r := rows["nginx 1.30.6"]; r["status"] != "vulnerable" || r["fix"] != cleanNginx(t, "1.30") || !strings.Contains(str(r["sources"].([]any)[0]), "nginx:1.30.6-alpine") {
 		t.Errorf("1.30.6: %v", r)
 	}
 }
 
+// cleanNginx is the lowest release of a line that the snapshot's own verdict clears of every advisory: the releases named
+// as fixes in the data, tried from the lowest up. It is the data's answer, so a new advisory moves it.
+func cleanNginx(t *testing.T, line string) string {
+	t.Helper()
+	d := data.Bundled().Servers["nginx"]
+	var cands []string
+	for _, a := range d.Advisories {
+		for _, f := range a.Fixed {
+			if strings.HasPrefix(f, line+".") && !slices.Contains(cands, f) {
+				cands = append(cands, f)
+			}
+		}
+	}
+	num := func(v string) []int {
+		var out []int
+		for _, p := range strings.Split(v, ".") {
+			n, _ := strconv.Atoi(p)
+			out = append(out, n)
+		}
+		return out
+	}
+	slices.SortFunc(cands, func(a, b string) int { return slices.Compare(num(a), num(b)) })
+	for _, c := range cands {
+		if r, ok := core.ServerVerdict(c, d); ok && r.Status == core.OK {
+			return c
+		}
+	}
+	t.Fatalf("no release of nginx %s is clear of every advisory in the snapshot (fixes named: %v)", line, cands)
+	return ""
+}
+
 func TestScanFixedNginxTagsAreOk(t *testing.T) {
-	code, v := scanJSON(t, fixture("websrv/nginx-fixed"), webData(t, "", nil), "--lang=en")
+	// The clean releases are the data's, so the tags are written here and not committed.
+	d := t.TempDir()
+	write(t, d, "docker-compose.yml", "services:\n  web:\n    image: nginx:"+cleanNginx(t, "1.31")+"\n  edge:\n    image: nginx:"+cleanNginx(t, "1.30")+"-alpine\n")
+	code, v := scanJSON(t, d, webData(t, "", nil), "--lang=en")
 	if code != 0 {
 		t.Fatalf("exit %d: %v", code, v["summary"])
 	}
@@ -216,7 +254,7 @@ func webHost(t *testing.T, root string) []rep {
 func TestHostJudgesVendorNginxAndCaddyPackagesAsTheProducts(t *testing.T) {
 	rows := byProduct(webHost(t, filepath.Join("internal", "linux", "testdata", "vendor-web-ubuntu2404")))
 	n := rows["nginx 1.31.8"]
-	if n == nil || n["status"] != "vulnerable" || n["fix"] != "1.31.9" || !slices.Contains(advisoryIDs(n), "CVE-2026-123007") || !strings.Contains(str(n["how"]), "origin read by apt-lists") {
+	if n == nil || n["status"] != "vulnerable" || n["fix"] != cleanNginx(t, "1.31") || !slices.Contains(advisoryIDs(n), "CVE-2026-123007") || !strings.Contains(str(n["how"]), "origin read by apt-lists") {
 		t.Errorf("nginx.org build: %v", n)
 	}
 	c := rows["caddy 2.11.4"]
@@ -299,7 +337,7 @@ func TestScanJudgesTheProxyImages(t *testing.T) {
 		{"haproxy-vulnerable", "haproxy", "3.4.4", "3.4.7"},
 		{"varnish-vulnerable", "varnish", "9.0.3", "9.0.4"},
 		{"apache-traffic-server-vulnerable", "apache-traffic-server", "10.2.0", "10.2.1"},
-		{"angie-vulnerable", "angie", "1.12.1", "1.12.4"},
+		{"angie-vulnerable", "angie", "1.12.1", "1.12.5"}, // 1.12.5 (2026-11-22) is the release that clears 1.12.1
 	} {
 		code, v := scanJSON(t, fixture("websrv/"+c.dir), webData(t, "", nil), "--lang=en")
 		r := byProduct(results(v))[c.product+" "+c.version]
@@ -307,12 +345,25 @@ func TestScanJudgesTheProxyImages(t *testing.T) {
 			t.Errorf("%s %s %s: exit %d: %v", c.dir, c.product, c.version, code, r)
 		}
 	}
-	for _, d := range []string{"envoy-fixed", "haproxy-fixed", "varnish-fixed", "apache-traffic-server-fixed", "angie-fixed", "openresty-fixed"} {
+	for _, d := range []string{"envoy-fixed", "haproxy-fixed", "varnish-fixed", "apache-traffic-server-fixed", "angie-fixed"} {
 		code, v := scanJSON(t, fixture("websrv/"+d), webData(t, "", nil), "--lang=en")
 		for k, r := range byProduct(results(v)) {
 			if code != 0 || r["status"] != "ok" || r["fix"] != nil {
 				t.Errorf("%s %s: exit %d: %v", d, k, code, r)
 			}
+		}
+	}
+}
+
+// No real OpenResty release has a clean nginx core in the list yet, so the tag is made up from the data's clean nginx
+// release plus a patch level. It proves the ok path, nothing more.
+func TestScanOpenRestyOnACleanNginxIsOk(t *testing.T) {
+	d := t.TempDir()
+	write(t, d, "docker-compose.yml", "services:\n  s1:\n    image: openresty/openresty:"+cleanNginx(t, "1.31")+".1-alpine\n")
+	code, v := scanJSON(t, d, webData(t, "", nil), "--lang=en")
+	for k, r := range byProduct(results(v)) {
+		if code != 0 || r["status"] != "ok" || r["fix"] != nil {
+			t.Errorf("%s: exit %d: %v", k, code, r)
 		}
 	}
 }
@@ -373,7 +424,7 @@ func TestScanEndedKongLineIsUnsupported(t *testing.T) {
 // their newest build of a line, so the versions are the ones the repos held on 2026-11-19.
 func TestHostJudgesVendorProxyPackagesAsTheProducts(t *testing.T) {
 	rows := byProduct(webHost(t, filepath.Join("internal", "linux", "testdata", "vendor-proxies-ubuntu2404")))
-	for k, want := range map[string]string{"haproxy 3.2.27": "ok", "angie 1.12.4": "ok", "varnish 7.5.0": "vulnerable", "openresty 1.31.8.1": "vulnerable"} {
+	for k, want := range map[string]string{"haproxy 3.2.27": "ok", "angie 1.12.4": "vulnerable", "varnish 7.5.0": "vulnerable", "openresty 1.31.8.1": "vulnerable"} {
 		r := rows[k]
 		if r == nil || r["status"] != want || !strings.Contains(str(r["how"]), "origin read by apt-lists") {
 			t.Errorf("%s: %v", k, r)
@@ -384,6 +435,11 @@ func TestHostJudgesVendorProxyPackagesAsTheProducts(t *testing.T) {
 	}
 	if r := rows["varnish 7.5.0"]; r == nil || !slices.Contains(advisoryIDs(r), "CVE-2025-8671") {
 		t.Errorf("Varnish: %v", r)
+	}
+	// 1.12.4 was clean when this fixture was taken (2026-11-19); the 2026-11-22 list names 1.12.5 as its fix, and a
+	// vendor build must follow its own product's list, not stay "ok" because the fixture is old.
+	if r := rows["angie 1.12.4"]; r == nil || r["fix"] != "1.12.5" || len(advisoryIDs(r)) == 0 {
+		t.Errorf("Angie: %v", r)
 	}
 	for k := range rows {
 		for _, p := range []string{"pkg:haproxy", "pkg:varnish", "pkg:openresty", "pkg:angie"} {

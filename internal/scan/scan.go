@@ -43,7 +43,9 @@ func Discover(target string, withPackages bool, rs *rules.Set) (*report.Inventor
 		return nil, &NotADir{target}
 	}
 	dir, _ := filepath.Abs(target)
-	return report.InventoryOf(dir, project.WalkWith(dir, rs), withPackages), nil
+	inv := report.InventoryOf(dir, project.WalkWith(dir, rs), withPackages)
+	core.SanitizeTree(inv) // the one pass over the finished value: every renderer and agent channel reads it clean
+	return inv, nil
 }
 
 var (
@@ -51,8 +53,16 @@ var (
 	looksHost = core.NewRe(`(?i)^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(/\S*)?$`)
 )
 
-// Host scans a machine, or a mounted root. root "": this machine, which must be Linux.
-func Host(root, kernel string, offline bool) (*report.Report, error) {
+// HostOptions say what Host scans. Root "": this machine, which must be Linux. Name, when set, is what the report calls
+// the target in place of the root path.
+type HostOptions struct {
+	Root, Kernel, Name string
+	Offline            bool
+}
+
+// Host scans a machine, or a mounted root.
+func Host(o HostOptions) (*report.Report, error) {
+	root, kernel, offline := o.Root, o.Kernel, o.Offline
 	if root == "" && runtime.GOOS != "linux" {
 		return nil, errors.New("this machine is not Linux: use --root with a mounted image or an extracted container tree")
 	}
@@ -60,13 +70,18 @@ func Host(root, kernel string, offline bool) (*report.Report, error) {
 	if root == "" {
 		root, shown = "/", "this machine"
 	}
+	if o.Name != "" {
+		shown = o.Name
+	}
 	snapshot := func() *core.Snapshot { return data.Load(offline, UserAgent).Snapshot }
 	exact := (&websrv.Judge{Snapshot: snapshot, Offline: offline, UserAgent: UserAgent}).Exact
 	h, err := linux.Scan(linux.Options{Root: root, Kernel: kernel, Offline: offline, UserAgent: UserAgent, Snapshot: snapshot, Exact: exact})
 	if err != nil {
 		return nil, err
 	}
-	return report.Host(h, shown), nil
+	rep := report.Host(h, shown)
+	core.SanitizeTree(rep)
+	return rep, nil
 }
 
 // Target scans a directory if one has that name, a URL if it says so or looks like a host. public: an agent chose the
@@ -107,11 +122,15 @@ func Target(target string, offline, public bool, rs *rules.Set) (*report.Report,
 			d = osvdb.Scan(w.Pkgs, offline, UserAgent)
 		}
 		exact := (&websrv.Judge{Snapshot: func() *core.Snapshot { return l.Snapshot }, Offline: offline, UserAgent: UserAgent}).Exact
-		return report.Dir(dir, w, l, lines, d, exact), l, nil
+		rep := report.Dir(dir, w, l, lines, d, exact)
+		core.SanitizeTree(rep)
+		return rep, l, nil
 	}
 	o, err := site.Inspect(url, site.NewGet(UserAgent, public), l.Snapshot.Requirements)
 	if err != nil {
 		return nil, nil, err
 	}
-	return report.Site(url, o, l), l, nil
+	rep := report.Site(url, o, l)
+	core.SanitizeTree(rep)
+	return rep, l, nil
 }

@@ -32,13 +32,13 @@ const Tool = "rasoat"
 
 type Result struct {
 	core.Verdict
-	Sources []string `json:"sources"`
-	How     *string  `json:"how"`
+	Sources []string `json:"sources" untrusted:"4096"`
+	How     *string  `json:"how" untrusted:"1000"`
 }
 
 type Target struct {
 	Kind  string `json:"kind"`
-	Value string `json:"value"`
+	Value string `json:"value" untrusted:"4096"`
 }
 
 type DataInfo struct {
@@ -46,7 +46,7 @@ type DataInfo struct {
 	Origin  string  `json:"origin"`
 	AgeDays int     `json:"age_days"`
 	Stale   bool    `json:"stale"`
-	Problem *string `json:"problem"`
+	Problem *string `json:"problem" untrusted:"500"`
 }
 
 type SiteInfo struct {
@@ -68,7 +68,7 @@ type HostInfo struct {
 	KernelNewest  *string `json:"kernel_newest"`
 	RebootNeeded  bool    `json:"reboot_needed"`
 	InContainer   bool    `json:"in_container"`
-	UpgradeCmd    *string `json:"upgrade_command"` // upgrades what was found; run nothing without consent
+	UpgradeCmd    *string `json:"upgrade_command" untrusted:"4096"` // upgrades what was found; run nothing without consent
 }
 
 type Summary struct {
@@ -95,7 +95,7 @@ type Report struct {
 	Notes      []string         `json:"notes"`      // machine words: binary-bun-lock, truncated, or <runtime>-min:<version>
 	NotJudged  []inventory.Item `json:"not_judged"` // images and pins no data judges, and references a variable hides
 	NotChecked []string         `json:"not_checked"`
-	Notices    []string         `json:"notices"`
+	Notices    []string         `json:"notices" untrusted:"500"`
 	ExitCode   int              `json:"exit_code"`
 }
 

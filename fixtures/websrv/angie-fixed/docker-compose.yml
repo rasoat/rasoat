@@ -1,5 +1,5 @@
 services:
   s1:
-    image: docker.angie.software/angie:1.12.4-alpine
+    image: docker.angie.software/angie:1.12.5-alpine
   s2:
-    image: docker.angie.software/angie:1.12.4
+    image: docker.angie.software/angie:1.12.5

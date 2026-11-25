@@ -21,8 +21,8 @@ type VerdictAdvisory struct {
 	ID       string   `json:"id"`
 	Severity string   `json:"severity"`
 	CVSS     *float64 `json:"cvss"`
-	Summary  string   `json:"summary"`
-	URL      string   `json:"url"`
+	Summary  string   `json:"summary" untrusted:"500"`
+	URL      string   `json:"url" untrusted:"2048"`
 }
 
 type Verdict struct {

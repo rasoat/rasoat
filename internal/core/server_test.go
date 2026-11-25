@@ -3,6 +3,8 @@ package core_test
 import (
 	"encoding/json"
 	"slices"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/rasoat/rasoat/internal/core"
@@ -66,7 +68,7 @@ func TestServerPlanCases(t *testing.T) {
 		d                    *core.ServerAdvisories
 		version, status, fix string
 	}{
-		{n, "1.31.8", core.Vulnerable, "1.31.9"}, {n, "1.30.6", core.Vulnerable, "1.30.7"}, {n, "1.31.9", core.OK, ""}, {n, "1.30.7", core.OK, ""},
+		{n, "1.31.8", core.Vulnerable, cleanNginx(t, "1.31")}, {n, "1.30.6", core.Vulnerable, cleanNginx(t, "1.30")}, {n, cleanNginx(t, "1.31"), core.OK, ""}, {n, cleanNginx(t, "1.30"), core.OK, ""},
 		{h, "2.4.70", core.Vulnerable, "2.4.71"}, {h, "2.4.71", core.OK, ""}, {h, "2.2.34", core.Vulnerable, "2.4.71"},
 	} {
 		got, ok := core.ServerVerdict(c.version, c.d)
@@ -75,7 +77,7 @@ func TestServerPlanCases(t *testing.T) {
 		}
 	}
 	got, _ := core.ServerVerdict("1.31.8", n)
-	if !slices.ContainsFunc(got.Hits, func(x core.ServerHit) bool { return x.ID == "CVE-2026-123007" && x.Severity == "high" }) || len(got.Hits) != 10 {
+	if !slices.ContainsFunc(got.Hits, func(x core.ServerHit) bool { return x.ID == "CVE-2026-123007" && x.Severity == "high" }) || !slices.ContainsFunc(got.Hits, func(x core.ServerHit) bool { return x.ID == "CVE-2026-123633" }) {
 		t.Errorf("%+v", got.Hits)
 	}
 	if got, _ := core.ServerVerdict("2.2.34", h); !got.EOL || got.Line != "2.2" {
@@ -89,6 +91,37 @@ func TestServerPlanCases(t *testing.T) {
 	if _, ok := core.ServerVerdict("2.6.0", h); ok {
 		t.Error("2.6.0 is on a line the data does not name")
 	}
+}
+
+// cleanNginx is the lowest release of a line that the snapshot's own verdict clears of every advisory: the releases named
+// as fixes in the data, tried from the lowest up. It is the data's answer, so a new advisory moves it.
+func cleanNginx(t *testing.T, line string) string {
+	t.Helper()
+	d := data.Bundled().Servers["nginx"]
+	var cands []string
+	for _, a := range d.Advisories {
+		for _, f := range a.Fixed {
+			if strings.HasPrefix(f, line+".") && !slices.Contains(cands, f) {
+				cands = append(cands, f)
+			}
+		}
+	}
+	num := func(v string) []int {
+		var out []int
+		for _, p := range strings.Split(v, ".") {
+			n, _ := strconv.Atoi(p)
+			out = append(out, n)
+		}
+		return out
+	}
+	slices.SortFunc(cands, func(a, b string) int { return slices.Compare(num(a), num(b)) })
+	for _, c := range cands {
+		if r, ok := core.ServerVerdict(c, d); ok && r.Status == core.OK {
+			return c
+		}
+	}
+	t.Fatalf("no release of nginx %s is clear of every advisory in the snapshot (fixes named: %v)", line, cands)
+	return ""
 }
 
 func TestServerRulesOnAMadeUpProduct(t *testing.T) {

@@ -33,9 +33,9 @@ type Item struct {
 	Kind       string  `json:"kind"`
 	Product    string  `json:"product"`
 	Version    *string `json:"version"`
-	Where      string  `json:"where"`
+	Where      string  `json:"where" untrusted:"4096"`
 	JudgedBy   *string `json:"judged_by"`
-	Ref        string  `json:"ref,omitempty"`
+	Ref        string  `json:"ref,omitempty" untrusted:"1024"`
 	Unresolved bool    `json:"unresolved,omitempty"`
 	// Rule is the user's rule that read this component. Acknowledged: the user's rule says no data judges it, and that is
 	// known: it is not "not judged".

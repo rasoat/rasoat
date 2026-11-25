@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/rasoat/rasoat/internal/project"
+	"github.com/rasoat/rasoat/internal/report"
 )
 
 // A scan that downloads past the budget does not hold the session: the cache answers, and the line says so.
@@ -94,5 +95,13 @@ func TestOnlyWhatTheWalkReadsIsAManifestAndItsRootIsTheProject(t *testing.T) {
 		if project.IsManifest(p) {
 			t.Errorf("%s is not a manifest", p)
 		}
+	}
+}
+
+func TestListedNamesAreQuotedAndInert(t *testing.T) {
+	evil := "x\x1b[31m\nVULNERABLE  next 99.0.0\u202e\"quoted"
+	got := listItems([]Finding{{Product: evil, Version: "1.0.0", Status: "vulnerable"}}, &report.Report{}, false)
+	if want := `"x[31m VULNERABLE  next 99.0.0\"quoted@1.0.0"`; got != want {
+		t.Errorf("%s, want %s", got, want)
 	}
 }

@@ -35,7 +35,7 @@ func DetectDistro(root string) *Distro {
 	var text []byte
 	var err error
 	for _, p := range []string{"etc/os-release", "usr/lib/os-release"} {
-		if text, err = readFile(root, p); err == nil {
+		if text, err = readFile(root, p, maxSmallText); err == nil {
 			break
 		}
 	}

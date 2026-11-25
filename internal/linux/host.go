@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/rasoat/rasoat/internal/images"
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -57,7 +56,7 @@ var Notices = []string{"Linux advisories, through OSV.dev: Ubuntu and Alpine (CC
 var ErrNotLinux = errors.New("no /etc/os-release under this root: not a Linux root")
 
 func readRunningKernel(root string) string {
-	b, err := readFile(root, "proc/sys/kernel/osrelease")
+	b, err := readFile(root, "proc/sys/kernel/osrelease", maxProcFile)
 	if err != nil {
 		return ""
 	}
@@ -67,11 +66,11 @@ func readRunningKernel(root string) string {
 // inContainer: the kernel a process sees then is the host's, and no package here says anything about it.
 func inContainer(root string) bool {
 	for _, p := range []string{".dockerenv", "run/.containerenv"} {
-		if _, err := os.Stat(filepath.Join(root, p)); err == nil {
+		if existsIn(root, p) {
 			return true
 		}
 	}
-	b, err := readFile(root, "proc/1/cgroup")
+	b, err := readFile(root, "proc/1/cgroup", maxProcFile)
 	return err == nil && regexp.MustCompile(`docker|containerd|kubepods|lxc|podman`).Match(b)
 }
 
@@ -224,7 +223,9 @@ func Scan(o Options) (*Host, error) {
 		unjudged = "package-database-not-read"
 	} else {
 		var err error
-		pkgs, err = ReadPackages(o.Root, d.Family)
+		var notes []string
+		pkgs, notes, err = readPackages(o.Root, d.Family)
+		h.Notes = append(h.Notes, notes...)
 		switch {
 		case errors.Is(err, os.ErrNotExist):
 			unjudged = "package-database-not-found"
@@ -233,7 +234,7 @@ func Scan(o Options) (*Host, error) {
 		}
 	}
 	h.Packages = len(pkgs)
-	assignOrigins(o.Root, d.Family, pkgs)
+	h.Notes = append(h.Notes, assignOrigins(o.Root, d.Family, pkgs)...)
 
 	groups := map[string]*group{}
 	var images, vendorPkgs []Package

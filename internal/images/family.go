@@ -53,7 +53,8 @@ func init() {
 	add(Family{ID: "bun", Name: "Bun", Core: true}, "oven/bun")
 	add(Family{ID: "php", Name: "PHP", Core: true}, "php")
 	add(Family{ID: "wordpress", Name: "WordPress", Core: true}, "wordpress")
-	add(Family{ID: "postgresql", Name: "PostgreSQL", ExactParts: 2}, "postgres")
+	// postgis/postgis tags read as `17-3.7`: the PostgreSQL major, then the PostGIS version. Plain, not PgTag.
+	add(Family{ID: "postgresql", Name: "PostgreSQL", ExactParts: 2}, "postgres", "postgis/postgis")
 	w := *byID["postgresql"]
 	w.PgTag = true
 	pgWrapped = &w
@@ -63,7 +64,7 @@ func init() {
 	add(Family{ID: "redis", Name: "Redis"}, "redis")
 	add(Family{ID: "nginx", Name: "nginx", Advisories: true}, "nginx")
 	add(Family{ID: "mariadb", Name: "MariaDB"}, "mariadb")
-	add(Family{ID: "mysql", Name: "MySQL"}, "mysql")
+	add(Family{ID: "mysql", Name: "MySQL"}, "mysql", "mysql/mysql-server")
 	add(Family{ID: "clickhouse", Name: "ClickHouse"}, "clickhouse/clickhouse-server")
 	add(Family{ID: "caddy", Name: "Caddy", Advisories: true}, "caddy")
 	add(Family{ID: "apache-http-server", Name: "Apache httpd", Advisories: true}, "httpd")
@@ -98,6 +99,11 @@ func init() {
 	add(Family{ID: "lighttpd", Name: "lighttpd", NoEOL: true}) // no official image; the community ones are not recognised
 	add(Family{ID: "tengine", Name: "Tengine", NoEOL: true})   // no official image
 	add(Family{ID: "kong-gateway", Name: "Kong Gateway"}, "kong", "kong/kong-gateway")
+	// Recognised, judged unknown until a list exists (FLEET-03c): Docker Hub names checked 2026-11-20 with hub-tags.ts.
+	// minio/minio is not on Docker Hub, and immich's image is on ghcr.io: both stay out until a name is checked.
+	add(Family{ID: "valkey", Name: "Valkey", NoEOL: true}, "valkey/valkey")
+	add(Family{ID: "clamav", Name: "ClamAV", NoEOL: true}, "clamav/clamav")
+	add(Family{ID: "uptime-kuma", Name: "Uptime Kuma", NoEOL: true}, "louislam/uptime-kuma")
 }
 
 // ciKeys maps a workflow's `<key>-version:` to a family id.

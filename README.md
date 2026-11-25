@@ -203,6 +203,22 @@ not findings. The kernel upstream check does not know your configuration: most C
 you. The data comes through OSV, which can lag a distro by days: in our comparison with Trivy on 19 images (575
 vulnerable packages, 571 in common), the only fixes we missed were ones OSV had not yet published. Paid extended support (Ubuntu Pro, Debian ELTS) is not seen.
 
+### Pull mode
+
+To judge a machine without installing anything on it, run `scripts/host-files.sh` there. It is POSIX sh and awk, runs no
+rasoat, and writes a tar to stdout of only the files `rasoat host` reads: os-release, the package database, and for apt
+each release file cut to its header and each Packages list cut to the installed packages. It is small enough to move
+over a slow link, and the answer is the same as on the whole tree.
+
+```
+ssh host 'sh -s' < scripts/host-files.sh > host.tar
+mkdir t && tar -xf host.tar -C t
+rasoat host --root t --name LABEL      # LABEL names the machine in the report instead of the path
+```
+
+`sh scripts/host-files.sh /mnt/image > host.tar` does the same for a mounted image. Compressed apt lists (`.lz4`) are
+skipped, as `host` does not read them.
+
 ## What it reads
 
 | Product | From |

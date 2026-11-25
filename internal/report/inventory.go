@@ -31,7 +31,7 @@ type Inventory struct {
 	Summary InventorySummary `json:"summary"`
 	Items   []inventory.Item `json:"items"`
 	Notes   []string         `json:"notes"`
-	Notices []string         `json:"notices"`
+	Notices []string         `json:"notices" untrusted:"500"`
 }
 
 // InventoryOf is the inventory of a walked directory. withPackages: list every lockfile package; without, they are

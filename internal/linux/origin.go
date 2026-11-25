@@ -3,7 +3,6 @@ package linux
 import (
 	"bufio"
 	"io"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -67,10 +66,13 @@ func markerVendor(version string) string {
 //
 // Backports are the distro's builds, but its security advisories do not track that pocket, so a version listed only there
 // is not judged: "<Origin> backports".
-func aptOrigins(root string, pkgs []Package) {
-	names, err := listDir(root, "var/lib/apt/lists")
+func aptOrigins(root string, pkgs []Package) (notes []string) {
+	names, truncated, err := listDir(root, "var/lib/apt/lists")
 	if err != nil {
-		return
+		return nil
+	}
+	if truncated {
+		notes = append(notes, tooManyFiles)
 	}
 	have := map[string]bool{}
 	for _, p := range pkgs {
@@ -123,6 +125,7 @@ func aptOrigins(root string, pkgs []Package) {
 			pkgs[i].Vendor, pkgs[i].Decided = label, "apt-lists"
 		}
 	}
+	return notes
 }
 
 // releasePrefix is the file-name prefix a Packages list shares with its release file: everything through the suite,
@@ -147,7 +150,7 @@ func readOrigin(root, rel string) string {
 		return ""
 	}
 	defer f.Close()
-	sc := bufio.NewScanner(io.LimitReader(f, 1<<20))
+	sc := bufio.NewScanner(io.LimitReader(f, maxSmallText))
 	for sc.Scan() {
 		line := sc.Text()
 		if v, ok := strings.CutPrefix(line, "Origin:"); ok {
@@ -162,7 +165,7 @@ func readOrigin(root, rel string) string {
 
 // scanPackages calls found("name version") for each stanza of a plain Packages file whose pair is wanted.
 func scanPackages(root, rel string, wanted map[string]bool, found func(string)) {
-	f, err := openFile(root, rel)
+	f, err := openCapped(root, rel, maxAptList)
 	if err != nil {
 		return
 	}
@@ -190,41 +193,11 @@ func scanPackages(root, rel string, wanted map[string]bool, found func(string)) 
 	flush()
 }
 
-// listDir names the entries of a directory under root, the way readFile reads a file: inside the image.
-func listDir(root, rel string) ([]string, error) {
-	var entries []os.DirEntry
-	if root == "/" {
-		var err error
-		if entries, err = os.ReadDir("/" + rel); err != nil {
-			return nil, err
-		}
-	} else {
-		r, err := os.OpenRoot(root)
-		if err != nil {
-			return nil, err
-		}
-		defer r.Close()
-		d, err := r.Open(rel)
-		if err != nil {
-			return nil, err
-		}
-		defer d.Close()
-		if entries, err = d.ReadDir(-1); err != nil {
-			return nil, err
-		}
-	}
-	out := make([]string, 0, len(entries))
-	for _, e := range entries {
-		out = append(out, e.Name())
-	}
-	return out, nil
-}
-
 // assignOrigins sets Vendor and Decided on every package: the lists or the rpm header first, then the version markers
 // for what they left undecided. A package nothing decides stays the distro's, as before.
-func assignOrigins(root, family string, pkgs []Package) {
+func assignOrigins(root, family string, pkgs []Package) (notes []string) {
 	if family == "deb" {
-		aptOrigins(root, pkgs)
+		notes = aptOrigins(root, pkgs)
 	}
 	for i := range pkgs {
 		if pkgs[i].Decided != "" {
@@ -237,4 +210,5 @@ func assignOrigins(root, family string, pkgs []Package) {
 			pkgs[i].Vendor, pkgs[i].Decided = v, "version-marker"
 		}
 	}
+	return notes
 }

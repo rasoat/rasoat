@@ -24,10 +24,10 @@ var exactVersion = core.NewRe(`^\d+\.\d+\.\d+`)
 
 // Change is one place to make the change. Command is nil where there is no one right command; How always says what to do.
 type Change struct {
-	File    string  `json:"file"`
-	Cwd     *string `json:"cwd"`
-	Command *string `json:"command"`
-	How     string  `json:"how"`
+	File    string  `json:"file" untrusted:"4096"`
+	Cwd     *string `json:"cwd" untrusted:"4096"`
+	Command *string `json:"command" untrusted:"4096"`
+	How     string  `json:"how" untrusted:"1000"`
 }
 
 type Requirement struct {
@@ -40,7 +40,7 @@ type Requirement struct {
 type WorstAdvisory struct {
 	ID       string `json:"id"`
 	Severity string `json:"severity"`
-	URL      string `json:"url"`
+	URL      string `json:"url" untrusted:"2048"`
 }
 
 type AdvisoryCount struct {
@@ -67,7 +67,7 @@ type CleanItem struct {
 }
 
 type RescanArgs struct {
-	Target string `json:"target"`
+	Target string `json:"target" untrusted:"4096"`
 }
 
 // Rescan is not a shell line: a directory's name is the project's text.
@@ -86,7 +86,7 @@ type FixPlan struct {
 	Clean      []CleanItem `json:"clean"`
 	Rescan     Rescan      `json:"rescan"`
 	NotChecked []string    `json:"not_checked"`
-	Notices    []string    `json:"notices"`
+	Notices    []string    `json:"notices" untrusted:"500"`
 }
 
 // line is the part of a version that makes a move risky: 14 for Next.js and Node.js, 6.4 for WordPress and PHP.
