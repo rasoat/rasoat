@@ -265,8 +265,10 @@ func Scan(o Options) (*Host, error) {
 			wanted[b.Name] = true
 		}
 	}
+	// A tree pulled from a live machine carries its proc/sys/kernel/osrelease: what runs there, not what is newest. A
+	// mounted image has an empty proc, and then the newest installed kernel, the one that would boot, is judged.
 	running := o.Kernel
-	if running == "" && o.Root == "/" && !h.InContainer {
+	if running == "" && !h.InContainer {
 		running = readRunningKernel(o.Root)
 	}
 	h.Running = running

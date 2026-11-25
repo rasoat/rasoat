@@ -1,7 +1,7 @@
 {
   "name": "rasoat",
   "description": "Scan a project, a site or a Linux machine for vulnerable versions (every npm, crates.io and Go package, container images and CI pins, Next.js, WordPress core, Node.js, PHP, Bun, web servers and proxies (nginx, Apache, Caddy, Traefik, HAProxy, Envoy, Varnish, Squid, Angie, OpenResty), the kernel, distro and vendor packages), then upgrade and rescan. Local vulnerability data, hooks that rescan when a lockfile changes, read-only tools; the fix stays in your hands.",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "author": { "name": "Rà Soát editors", "email": "editors@rasoat.com" },
   "homepage": "https://rasoat.com",
   "repository": "https://github.com/rasoat/rasoat",

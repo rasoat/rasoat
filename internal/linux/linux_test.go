@@ -342,6 +342,29 @@ func TestHost(t *testing.T) {
 		t.Errorf("newest %s reboot %v", h.Newest, h.Reboot)
 	}
 
+	// A tree pulled from a live machine says what runs: the older kernel is judged, and the newer asks for a reboot.
+	osrel := filepath.Join(root, "proc/sys/kernel/osrelease")
+	if err := os.MkdirAll(filepath.Dir(osrel), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(osrel, []byte("6.1.0-21-amd64\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	pulled := scan("")
+	if k := find(pulled, "linux"); k == nil || *k.Version != "6.1.0-21-amd64" || !strings.Contains(k.How, "linux-image-6.1.0-21-amd64") || !pulled.Reboot {
+		t.Fatalf("running kernel from the tree: %+v reboot %v", k, pulled.Reboot)
+	}
+	// A vendor kernel no package here explains still gets its row, unknown, never dropped.
+	if err := os.WriteFile(osrel, []byte("7.0.14-28-pve\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if k := find(scan(""), "linux"); k == nil || k.Status != core.Unknown || *k.Version != "7.0.14-28-pve" || *k.Reason != "vendor-kernel" {
+		t.Fatalf("vendor kernel from the tree: %+v", k)
+	}
+	if err := os.Remove(osrel); err != nil {
+		t.Fatal(err)
+	}
+
 	// A named kernel that is the older of two installed: judged as that one, by its package.
 	older := find(scan("6.1.0-21-amd64"), "linux")
 	if older == nil || !strings.Contains(older.How, "linux-image-6.1.0-21-amd64") {
